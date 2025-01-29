@@ -1,0 +1,255 @@
+{
+  "info": {
+    "name": "Food Delivery App",
+    "description": "Postman collection for testing the Food Delivery App backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"CUSTOMER\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/users/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["users", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Restaurant",
+      "item": [
+        {
+          "name": "Create Restaurant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pizza Place\",\n  \"address\": \"123 Main St\",\n  \"phone\": \"123-456-7890\",\n  \"deliveryConstraints\": \"Within 5 miles\",\n  \"user\": { \"id\": 1 }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/restaurants",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["restaurants"]
+            }
+          }
+        },
+        {
+          "name": "Get Restaurant",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/restaurants/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["restaurants", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "FoodItem",
+      "item": [
+        {
+          "name": "Create FoodItem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pizza\",\n  \"description\": \"Delicious cheese pizza\",\n  \"price\": 9.99,\n  \"photos\": \"http://example.com/pizza.jpg\",\n  \"restaurant\": { \"id\": 1 }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/food-items",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["food-items"]
+            }
+          }
+        },
+        {
+          "name": "Get FoodItem",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/food-items/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["food-items", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": { \"id\": 1 },\n  \"restaurant\": { \"id\": 1 },\n  \"status\": \"PENDING\",\n  \"totalPrice\": 19.99,\n  \"orderItems\": [\n    { \"foodItem\": { \"id\": 1 }, \"quantity\": 2 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/orders",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/orders/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["orders", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delivery",
+      "item": [
+        {
+          "name": "Create Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": { \"id\": 1 },\n  \"deliveryPerson\": { \"id\": 1 },\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/deliveries",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["deliveries"]
+            }
+          }
+        },
+        {
+          "name": "Get Delivery",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/deliveries/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["deliveries", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Review",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": { \"id\": 1 },\n  \"restaurant\": { \"id\": 1 },\n  \"rating\": 5,\n  \"comment\": \"Great food!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/reviews",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Reviews by Restaurant",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/reviews/restaurant/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["reviews", "restaurant", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
