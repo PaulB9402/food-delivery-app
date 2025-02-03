@@ -1,4 +1,4 @@
-# Backend - Food Delivery App
+# Food Delivery App
 
 ## Overview
 The backend of the Food Delivery App is built using Spring Boot and Gradle. It provides RESTful APIs for managing food orders, users, and restaurants.

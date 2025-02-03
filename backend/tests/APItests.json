@@ -1,12 +1,11 @@
 {
   "info": {
-    "name": "Food Delivery App",
-    "description": "Postman collection for testing the Food Delivery App backend",
+    "name": "Food Delivery API Tests",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "User",
+      "name": "UserController",
       "item": [
         {
           "name": "Create User",
@@ -20,34 +19,30 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"CUSTOMER\"\n}"
+              "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"role\": \"CUSTOMER\"\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/users",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
               "path": ["users"]
             }
           }
         },
         {
-          "name": "Get User",
+          "name": "Get User by ID",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "http://localhost:8080/users/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["users", "1"]
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
             }
           }
         }
       ]
     },
     {
-      "name": "Restaurant",
+      "name": "RestaurantController",
       "item": [
         {
           "name": "Create Restaurant",
@@ -61,37 +56,33 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Pizza Place\",\n  \"address\": \"123 Main St\",\n  \"phone\": \"123-456-7890\",\n  \"deliveryConstraints\": \"Within 5 miles\",\n  \"user\": { \"id\": 1 }\n}"
+              "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"address\": \"123 Main St\",\n  \"phone\": \"555-1234\",\n  \"deliveryConstraints\": \"Minimum order: $10\",\n  \"user\": {\n    \"id\": {{user_id}}\n  }\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/restaurants",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{base_url}}/restaurants",
+              "host": ["{{base_url}}"],
               "path": ["restaurants"]
             }
           }
         },
         {
-          "name": "Get Restaurant",
+          "name": "Get Restaurant by ID",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "http://localhost:8080/restaurants/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["restaurants", "1"]
+              "raw": "{{base_url}}/restaurants/{{restaurant_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["restaurants", "{{restaurant_id}}"]
             }
           }
         }
       ]
     },
     {
-      "name": "FoodItem",
+      "name": "FoodItemController",
       "item": [
         {
-          "name": "Create FoodItem",
+          "name": "Create Food Item",
           "request": {
             "method": "POST",
             "header": [
@@ -102,34 +93,30 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Pizza\",\n  \"description\": \"Delicious cheese pizza\",\n  \"price\": 9.99,\n  \"photos\": \"http://example.com/pizza.jpg\",\n  \"restaurant\": { \"id\": 1 }\n}"
+              "raw": "{\n  \"name\": \"Pepperoni Pizza\",\n  \"description\": \"Classic pepperoni pizza\",\n  \"price\": 12.99,\n  \"photos\": \"https://example.com/pizza.jpg\",\n  \"restaurant\": {\n    \"id\": {{restaurant_id}}\n  }\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/food-items",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{base_url}}/food-items",
+              "host": ["{{base_url}}"],
               "path": ["food-items"]
             }
           }
         },
         {
-          "name": "Get FoodItem",
+          "name": "Get Food Item by ID",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "http://localhost:8080/food-items/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["food-items", "1"]
+              "raw": "{{base_url}}/food-items/{{food_item_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["food-items", "{{food_item_id}}"]
             }
           }
         }
       ]
     },
     {
-      "name": "Order",
+      "name": "OrderController",
       "item": [
         {
           "name": "Create Order",
@@ -143,34 +130,30 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customer\": { \"id\": 1 },\n  \"restaurant\": { \"id\": 1 },\n  \"status\": \"PENDING\",\n  \"totalPrice\": 19.99,\n  \"orderItems\": [\n    { \"foodItem\": { \"id\": 1 }, \"quantity\": 2 }\n  ]\n}"
+              "raw": "{\n  \"customer\": {\n    \"id\": {{user_id}}\n  },\n  \"restaurant\": {\n    \"id\": {{restaurant_id}}\n  },\n  \"status\": \"PENDING\",\n  \"totalPrice\": 25.98,\n  \"orderItems\": [\n    {\n      \"foodItem\": {\n        \"id\": {{food_item_id}}\n      },\n      \"quantity\": 2,\n      \"customization\": \"Extra cheese\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/orders",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
               "path": ["orders"]
             }
           }
         },
         {
-          "name": "Get Order",
+          "name": "Get Order by ID",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "http://localhost:8080/orders/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["orders", "1"]
+              "raw": "{{base_url}}/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "{{order_id}}"]
             }
           }
         }
       ]
     },
     {
-      "name": "Delivery",
+      "name": "DeliveryController",
       "item": [
         {
           "name": "Create Delivery",
@@ -184,39 +167,19 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"order\": { \"id\": 1 },\n  \"deliveryPerson\": { \"id\": 1 },\n  \"status\": \"PENDING\"\n}"
+              "raw": "{\n  \"order\": {\n    \"id\": {{order_id}}\n  },\n  \"deliveryPerson\": {\n    \"id\": {{delivery_person_id}}\n  },\n  \"status\": \"PENDING\"\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/deliveries",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{base_url}}/deliveries",
+              "host": ["{{base_url}}"],
               "path": ["deliveries"]
             }
           }
         },
         {
-          "name": "Get Delivery",
+          "name": "Update Delivery Status",
           "request": {
-            "method": "GET",
-            "url": {
-              "raw": "http://localhost:8080/deliveries/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["deliveries", "1"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Review",
-      "item": [
-        {
-          "name": "Create Review",
-          "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
@@ -225,31 +188,27 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customer\": { \"id\": 1 },\n  \"restaurant\": { \"id\": 1 },\n  \"rating\": 5,\n  \"comment\": \"Great food!\"\n}"
+              "raw": "{\n  \"status\": \"DELIVERED\"\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/reviews",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["reviews"]
-            }
-          }
-        },
-        {
-          "name": "Get Reviews by Restaurant",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "http://localhost:8080/reviews/restaurant/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["reviews", "restaurant", "1"]
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "{{delivery_id}}"]
             }
           }
         }
       ]
     }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080" },
+    { "key": "user_email", "value": "john.doe@example.com" },
+    { "key": "user_password", "value": "password123" },
+    { "key": "user_id", "value": "1" },
+    { "key": "restaurant_id", "value": "1" },
+    { "key": "food_item_id", "value": "1" },
+    { "key": "order_id", "value": "1" },
+    { "key": "delivery_person_id", "value": "2" },
+    { "key": "delivery_id", "value": "1" }
   ]
 }
