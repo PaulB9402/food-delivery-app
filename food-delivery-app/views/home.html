@@ -1,23 +1,125 @@
-<div class="container mt-4">
-    <h2>Restaurants populaires</h2>
-    <div class="row" id="restaurant-list">
-    </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodDelivery - Accueil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/main.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">FoodDelivery</a>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Rechercher restaurant...">
+                <button class="btn btn-light" type="submit">Search</button>
+            </form>
+            <div class="navbar-nav">
+                <a class="nav-link" href="profile.html">Mon Profil</a>
+                <a class="nav-link" href="#orders">Mes Commandes</a>
+                <a class="nav-link" href="login.html">Connexion</a>
+            </div>
+        </div>
+    </nav>
 
-    <div class="row mt-4">
-        <div class="col-md-4 filter-section">
-            <h4>Filtres</h4>
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label>Prix max</label>
-                        <input type="range" class="form-range" min="0" max="50">
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="deliveryCheck">
-                        <label class="form-check-label" for="deliveryCheck">Livraison disponible</label>
+    <!-- Contenu principal -->
+    <div class="container mt-4">
+        <!-- Section de bienvenue -->
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Bienvenue sur FoodDelivery !</h1>
+            <p class="lead">Commandez vos plats préférés en ligne et faites-vous livrer rapidement.</p>
+            <hr class="my-4">
+            <p>Découvrez nos restaurants partenaires et profitez de nos offres spéciales.</p>
+            <a class="btn btn-danger btn-lg" href="#restaurants" role="button">Explorer les restaurants</a>
+        </div>
+
+        <!-- Section des restaurants populaires -->
+        <section id="restaurants" class="mt-5">
+            <h2>Restaurants populaires</h2>
+            <div class="row" id="restaurant-list">
+                <!-- Les restaurants seront injectés via JS -->
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-4 filter-section">
+                    <h4>Filtres</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label>Prix max</label>
+                                <input type="range" class="form-range" min="0" max="50">
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="deliveryCheck">
+                                <label class="form-check-label" for="deliveryCheck">Livraison disponible</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Section des offres spéciales -->
+        <section class="mt-5">
+            <h2>Offres spéciales</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="./img/offer1.jpg" class="card-img-top" alt="Offre 1">
+                        <div class="card-body">
+                            <h5 class="card-title">Menu Famille</h5>
+                            <p class="card-text">2 pizzas + 1 boisson pour 25€ seulement !</p>
+                            <a href="#" class="btn btn-danger">Voir l'offre</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Ajouter d'autres offres ici -->
+            </div>
+        </section>
+
+        <!-- Section des catégories -->
+        <section class="mt-5">
+            <h2>Catégories</h2>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <img src="./img/pizza.jpg" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="card-title">Pizza</h5>
+                        </div>
+                    </div>
+                </div>
+                <!-- Ajouter d'autres catégories ici -->
+            </div>
+        </section>
     </div>
-</div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 p-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>À propos</h5>
+                    <p>FoodDelivery est une plateforme de commande et livraison de nourriture en ligne.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Liens utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Contact</a></li>
+                        <li><a href="#" class="text-white">CGU</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Suivez-nous</h5>
+                    <a href="#" class="text-white me-2">Facebook</a>
+                    <a href="#" class="text-white me-2">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
