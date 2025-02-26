@@ -1,0 +1,16 @@
+// Variables
+$primary: #FF6B6B;
+$secondary: #4ECDC4;
+
+// Override Vuetify variables
+$material-light: (
+  'background': #f5f5f5
+);
+
+.v-application {
+  font-family: 'Avenir', sans-serif;
+}
+
+.text-primary {
+  color: $primary !important;
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/restaurant.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation (identique à l'index) -->
+    <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
+        <!-- Copier la même navigation que index.html -->
+    </nav>
+
+    <div class="container mt-4">
+        <!-- En-tête du restaurant -->
+        <div class="row">
+            <div class="col-md-4">
+                <img src="../img/restaurant-cover.jpg" class="img-fluid rounded" alt="Cover image">
+            </div>
+            <div class="col-md-8">
+                <h1 id="restaurant-name">La Belle Pizza</h1>
+                <div class="rating-stars mb-3" data-rating="4.5"></div>
+                <p class="lead" id="restaurant-info">
+                    <span class="badge bg-warning text-dark">🚚 30-40 min</span>
+                    <span class="badge bg-success">€€</span>
+                    <span class="badge bg-info">Commande min: 15€</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Menu -->
+        <div class="row mt-4">
+            <h3>Menu</h3>
+            <div class="col-md-8" id="menu-items">
+                <!-- Les éléments du menu seront injectés via JS -->
+            </div>
+
+            <!-- Panier -->
+            <div class="col-md-4">
+                <div class="card sticky-top">
+                    <div class="card-header bg-danger text-white">
+                        <h5>Votre commande</h5>
+                    </div>
+                    <div class="card-body" id="cart-items">
+                        <p class="text-muted">Votre panier est vide</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-danger w-100">Commander (0.00€)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 border-top pt-3">
+            <h4>Communication avec le restaurant</h4>
+            <div class="chat-container bg-light p-3 rounded">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/restaurant.js"></script>
+</body>
+</html>
