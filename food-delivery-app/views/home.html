@@ -8,25 +8,22 @@
     <link href="./css/main.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#">FoodDelivery</a>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Rechercher restaurant...">
+            <form class="d-flex" action="restaurant.html" method="GET">
+                <input class="form-control me-2" type="search" name="search" placeholder="Rechercher des restaurants...">
                 <button class="btn btn-light" type="submit">Search</button>
             </form>
             <div class="navbar-nav">
                 <a class="nav-link" href="profile.html">Mon Profil</a>
                 <a class="nav-link" href="#orders">Mes Commandes</a>
-                <a class="nav-link" href="login.html">Connexion</a>
+                <a class="nav-link" href="./auth/login.html">Connexion</a>
             </div>
         </div>
     </nav>
 
-    <!-- Contenu principal -->
     <div class="container mt-4">
-        <!-- Section de bienvenue -->
         <div class="jumbotron bg-light p-5 rounded">
             <h1 class="display-4">Bienvenue sur FoodDelivery !</h1>
             <p class="lead">Commandez vos plats préférés en ligne et faites-vous livrer rapidement.</p>
@@ -35,11 +32,9 @@
             <a class="btn btn-danger btn-lg" href="#restaurants" role="button">Explorer les restaurants</a>
         </div>
 
-        <!-- Section des restaurants populaires -->
         <section id="restaurants" class="mt-5">
             <h2>Restaurants populaires</h2>
             <div class="row" id="restaurant-list">
-                <!-- Les restaurants seront injectés via JS -->
             </div>
             <div class="row mt-4">
                 <div class="col-md-4 filter-section">
@@ -60,7 +55,6 @@
             </div>
         </section>
 
-        <!-- Section des offres spéciales -->
         <section class="mt-5">
             <h2>Offres spéciales</h2>
             <div class="row">
@@ -74,11 +68,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- Ajouter d'autres offres ici -->
             </div>
         </section>
 
-        <!-- Section des catégories -->
         <section class="mt-5">
             <h2>Catégories</h2>
             <div class="row">
@@ -90,12 +82,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Ajouter d'autres catégories ici -->
             </div>
         </section>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-dark text-white mt-5 p-4">
         <div class="container">
             <div class="row">
