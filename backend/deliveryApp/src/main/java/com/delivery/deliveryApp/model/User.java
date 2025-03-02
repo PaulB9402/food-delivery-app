@@ -23,5 +23,3 @@ public class User {
     @Column(nullable = false)
     private String role; // e.g., CUSTOMER, RESTAURANT, DELIVERY, ADMIN
 }
-
-

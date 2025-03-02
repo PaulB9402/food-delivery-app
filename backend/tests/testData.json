@@ -1,0 +1,28 @@
+[
+    {
+      "username": "john_doe1",
+      "user_email": "john.doe1@example.com",
+      "user_password": "password1",
+      "restaurant_name": "Pizza Place 1",
+      "restaurant_address": "Address 1",
+      "restaurant_phone": "111-111-1111",
+      "restaurant_delivery_constraints": "Min $15",
+      "food_item_name": "Pizza",
+      "food_item_description": "Delicious Pizza",
+      "food_item_price": "12.99",
+      "food_item_photos": "pizza1.jpg"
+    },
+    {
+      "username": "john_doe2",
+      "user_email": "john.doe2@example.com",
+      "user_password": "password2",
+      "restaurant_name": "Pizza Place 2",
+      "restaurant_address": "Address 2",
+      "restaurant_phone": "222-222-2222",
+      "restaurant_delivery_constraints": "Min $25",
+      "food_item_name": "Pasta",
+      "food_item_description": "Delicious Pasta",
+      "food_item_price": "15.99",
+      "food_item_photos": "pasta.jpg"
+    }
+  ]
