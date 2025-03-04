@@ -35,7 +35,7 @@ if (filteredRestaurants.length > 0) {
                         <h5 class="card-title">${restaurant.name}</h5>
                         <p class="card-text">Cuisine : ${restaurant.cuisine}</p>
                         <p class="card-text">Plats : ${restaurant.dishes.join(", ")}</p>
-                        <a href="restaurant-details.html?name=${restaurant.name}" class="btn btn-danger">Voir le menu</a>
+                        <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
                     </div>
                 </div>
             </div>
@@ -44,4 +44,70 @@ if (filteredRestaurants.length > 0) {
     });
 } else {
     restaurantList.innerHTML = '<p class="text-muted">❌ Aucun restaurant trouvé.</p>';
+}
+
+let cart = [];
+
+function viewRestaurant(id) {
+    const restaurant = restaurants.find(r => r.id === id);
+
+    if (restaurant) {
+        document.getElementById('modal-restaurant-name').textContent = restaurant.name;
+        document.getElementById('modal-restaurant-cuisine').textContent = restaurant.cuisine;
+
+        const menuList = document.getElementById('modal-menu-list');
+        menuList.innerHTML = "";
+        restaurant.dishes.forEach(dish => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            listItem.innerHTML = `
+                ${dish}
+                <button class="btn btn-sm btn-success" onclick="addToCart('${dish}', '${restaurant.name}')">Ajouter</button>
+            `;
+            menuList.appendChild(listItem);
+        });
+
+        const menuModal = new bootstrap.Modal(document.getElementById('menuModal'));
+        menuModal.show();
+    }
+}
+
+function addToCart(dish, restaurantName) {
+    cart.push({ dish, restaurantName });
+    alert(`"${dish}" ajouté à la commande !`);
+}
+
+function viewCart() {
+    const cartList = document.getElementById('cart-items');
+    cartList.innerHTML = "";
+
+    if (cart.length === 0) {
+        cartList.innerHTML = '<p class="text-muted">Votre panier est vide.</p>';
+    } else {
+        cart.forEach((item, index) => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            listItem.innerHTML = `
+                ${item.dish} (${item.restaurantName})
+                <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">Supprimer</button>
+            `;
+            cartList.appendChild(listItem);
+        });
+    }
+
+    const total = cart.length * 10;
+    document.getElementById('cart-total').textContent = `${total.toFixed(2)}€`;
+
+    const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+    cartModal.show();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    viewCart();
+}
+
+function clearCart() {
+    cart = [];
+    viewCart();
 }
