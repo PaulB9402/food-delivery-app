@@ -29,6 +29,27 @@
         <div class="row" id="restaurant-list"></div>
     </div>
 
+    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="menuModalLabel">Menu du restaurant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3 id="modal-restaurant-name"></h3>
+                    <p><strong>Type de cuisine :</strong> <span id="modal-restaurant-cuisine"></span></p>
+                    <h4>Plats :</h4>
+                    <ul id="modal-menu-list" class="list-group"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <footer class="bg-dark text-white mt-5 p-4">
         <div class="container">
             <div class="row">
