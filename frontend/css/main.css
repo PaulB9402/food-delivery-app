@@ -1,0 +1,14 @@
+.rating-stars {
+    display: inline-block;
+}
+
+.star {
+    font-size: 1.5rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star.active {
+    color: #ffc107;
+}

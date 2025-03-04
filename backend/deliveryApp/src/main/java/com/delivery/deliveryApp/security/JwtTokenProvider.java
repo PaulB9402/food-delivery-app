@@ -26,9 +26,9 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userId) // User ID
+                .setSubject(userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour expiration
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
                 .signWith(key)
                 .compact();
     }
