@@ -1,8 +1,12 @@
-const BASE_URL = "http://localhost:8080";
+// auth.js
+const API_BASE_URL = "http://localhost:8080";
 
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 
+"use strict";
+
+import { storeJwtToken, clearJwtToken } from './utils.js';
 
 async function handleLogin(event) {
     event.preventDefault();
@@ -11,8 +15,8 @@ async function handleLogin(event) {
     const password = document.querySelector('#login-form input[type="password"]').value;
     const role = document.querySelector('#login-form #role').value;
 
-    if (!role) {
-        alert('Veuillez sélectionner un rôle.');
+    if (!email || !password) {
+        alert('Veuillez entrer votre email et mot de passe.');
         return;
     }
 
@@ -65,6 +69,7 @@ async function handleLogin(event) {
 
     }
 }
+
 async function handleRegister(event) {
     event.preventDefault();
     const username = document.querySelector('#register-form input[name="firstName"]').value +" "+ document.querySelector('#register-form input[name="lastName"]').value;
@@ -103,9 +108,8 @@ async function handleRegister(event) {
           throw new Error(errorMessage);
         }
 
-        const data = await response.json();
+        storeJwtToken(response.token);
         console.log('Inscription réussie:', data);
-
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Erreur lors de l\'inscription:', error);

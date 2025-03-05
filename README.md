@@ -19,6 +19,7 @@ cd food-delivery-app/backend
 ### Build the Project
 To build the project, run the following command:
 ```bash
+cd deliveryApp
 ./gradlew build
 ```
 
