@@ -1,11 +1,21 @@
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 
-
 async function loadUsers() {
+    if (!authToken) {
+        window.location.href = './login.html';  // Redirect to login if no auth token
+        return;
+    }
+
     const response = await fetch(`${API_BASE_URL}/users`, {
         headers: { "Authorization": `Bearer ${authToken}` }
     });
+
+    if (!response.ok) {
+        console.error("Failed to load users:", await response.text());
+        return;
+    }
+
     const users = await response.json();
     const userTable = document.getElementById("user-table");
 
@@ -23,11 +33,21 @@ async function loadUsers() {
     });
 }
 
-
 async function loadRestaurants() {
+    if (!authToken) {
+        window.location.href = './login.html';  // Redirect to login if no auth token
+        return;
+    }
+
     const response = await fetch(`${API_BASE_URL}/restaurants`, {
         headers: { "Authorization": `Bearer ${authToken}` }
     });
+
+    if (!response.ok) {
+        console.error("Failed to load restaurants:", await response.text());
+        return;
+    }
+
     const restaurants = await response.json();
     const restaurantTable = document.getElementById("restaurant-table");
 
@@ -45,7 +65,6 @@ async function loadRestaurants() {
     });
 }
 
-
 async function deleteUser(userId) {
     if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
         await fetch(`${API_BASE_URL}/users/${userId}`, {
@@ -55,7 +74,6 @@ async function deleteUser(userId) {
         location.reload();
     }
 }
-
 
 async function deleteRestaurant(restaurantId) {
     if (confirm("Voulez-vous vraiment supprimer ce restaurant ?")) {
@@ -67,8 +85,11 @@ async function deleteRestaurant(restaurantId) {
     }
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
-    loadUsers();
-    loadRestaurants();
+    if (!authToken) {
+        window.location.href = './login.html';  // Redirect to login if no auth token
+    } else {
+        loadUsers();
+        loadRestaurants();
+    }
 });

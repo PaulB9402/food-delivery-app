@@ -31,24 +31,27 @@ public class RestaurantController {
     private ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<?> createRestaurant(@Valid @RequestBody RestaurantRequestDTO restaurantRequestDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors()); // Return validation errors
-        }
-
-        Restaurant restaurant = modelMapper.map(restaurantRequestDTO, Restaurant.class);
-        // Assuming you want to associate the restaurant with a user
-        Optional<User> optionalUser = userRepository.findById(1L); // Replace 1L with the actual user ID
-        if(optionalUser.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        User user = optionalUser.get();
-        restaurant.setUser(user);
-
-        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
-        RestaurantResponseDTO restaurantResponseDTO = modelMapper.map(savedRestaurant, RestaurantResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(restaurantResponseDTO);
+public ResponseEntity<?> createRestaurant(@Valid @RequestBody RestaurantRequestDTO restaurantRequestDTO, BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+        return ResponseEntity.badRequest().body(bindingResult.getAllErrors()); // Return validation errors
     }
+
+    Restaurant restaurant = modelMapper.map(restaurantRequestDTO, Restaurant.class);
+
+    // Use the user ID from the request DTO
+    Long userId = restaurantRequestDTO.getUserId();
+    Optional<User> optionalUser = userRepository.findById(userId);
+    if (optionalUser.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+
+    User user = optionalUser.get();
+    restaurant.setUser(user);
+
+    Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+    RestaurantResponseDTO restaurantResponseDTO = modelMapper.map(savedRestaurant, RestaurantResponseDTO.class);
+    return ResponseEntity.status(HttpStatus.CREATED).body(restaurantResponseDTO);
+}
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getRestaurant(@PathVariable Long id) {

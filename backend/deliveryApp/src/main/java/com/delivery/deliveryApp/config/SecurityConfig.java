@@ -6,10 +6,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -18,18 +23,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity (consider enabling in production)
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {}) // Use the CorsFilter bean instead
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Don't create sessions
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/register", "/users/login").permitAll() // Allow registration and login without authentication
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Example: Admin-only endpoints
-                        .requestMatchers("/restaurants/**").hasAnyRole("RESTAURANT", "ADMIN") // Example: Restaurant and admin endpoints
+                        .requestMatchers("/users/register", "/users/login").permitAll()
+                        .requestMatchers("/food-delivery-app/frontend/**").permitAll() // Allow access to static resources
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/restaurants/**").hasAnyRole("RESTAURANT", "ADMIN")
                         .requestMatchers("/deliveries/**").hasAnyRole("DELIVERY", "ADMIN")
-                        .anyRequest().authenticated() // All other endpoints require authentication
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/users/login") // Custom login page (create a controller and view for this)
-                        .defaultSuccessUrl("/")  // Redirect after successful login
-                        .permitAll()
+                        .disable()
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
@@ -38,9 +44,24 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // CORS configuration should be working now:
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true); // Allow cookies to be sent
+        config.addAllowedOrigin("http://127.0.0.1:3000"); // Match this with your frontend URL
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("OPTIONS"); // Allow preflight requests
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Use BCrypt for password hashing
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

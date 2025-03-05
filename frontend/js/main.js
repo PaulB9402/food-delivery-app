@@ -1,9 +1,17 @@
 // main.js
 const API_BASE_URL = "http://localhost:8080";
+const authToken = localStorage.getItem("authToken");
 
 function loadRestaurants() {
+    if (!authToken) {
+        window.location.href = './views/auth/login.html';  // Redirect to login if no auth token
+        return;
+    }
+
     console.log("Loading restaurants..."); // Debugging log
-    fetch("http://localhost:8080/restaurants") // Replace with your actual API URL
+    fetch(`${API_BASE_URL}/restaurants`, {  // Use API_BASE_URL for consistency
+        headers: { "Authorization": `Bearer ${authToken}` }
+    })
         .then(response => response.json())
         .then(restaurants => {
             const restaurantList = document.getElementById("restaurant-list");

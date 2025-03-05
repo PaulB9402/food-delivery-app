@@ -24,7 +24,7 @@ public UserDetails loadUserByUsername(String username) throws UsernameNotFoundEx
     User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
     List<org.springframework.security.core.GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + user.getRole()));
+    authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole()));
 
     return new org.springframework.security.core.userdetails.User(
             user.getUsername(),

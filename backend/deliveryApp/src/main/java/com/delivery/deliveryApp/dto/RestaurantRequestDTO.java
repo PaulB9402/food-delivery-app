@@ -15,4 +15,6 @@ public class RestaurantRequestDTO {
     private String phone;
 
     private String deliveryConstraints;
+
+    private Long userId;
 }

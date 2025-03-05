@@ -4,7 +4,7 @@ const userId = localStorage.getItem("userId");
 
 async function loadOrders() {
     if (!authToken || !userId) {
-        window.location.href = './views/auth/login.html';
+        window.location.href = './views/auth/login.html';  // Redirect to login if no auth token or userId
         return;
     }
 
@@ -14,8 +14,8 @@ async function loadOrders() {
         });
 
         if (!response.ok) {
-          if (response.status === 401) {
-                logout();
+            if (response.status === 401) {
+                logout();  // Redirect to login if unauthorized
                 return;
             }
             const errorData = await response.json();
@@ -39,10 +39,10 @@ function displayOrders(orders) {
     pastOrdersContainer.innerHTML = "";
 
     orders.forEach(order => {
-      if (!order || !order.restaurant) {
-          console.error("Invalid order data:", order);
-          return;
-      }
+        if (!order || !order.restaurant) {
+            console.error("Invalid order data:", order);
+            return;
+        }
         const orderCard = `
             <div class="col-md-6 mb-4">
                 <div class="card">
@@ -67,14 +67,14 @@ function displayOrders(orders) {
     if (ongoingOrdersContainer.innerHTML === "") {
         ongoingOrdersContainer.innerHTML = "<p>Aucune commande en cours.</p>";
     }
-     if (pastOrdersContainer.innerHTML === "") {
+    if (pastOrdersContainer.innerHTML === "") {
         pastOrdersContainer.innerHTML = "<p>Aucune commande passée.</p>";
     }
 }
 
 async function viewOrderDetails(orderId) {
-     if (!authToken) {
-        window.location.href = 'login.html';
+    if (!authToken) {
+        window.location.href = 'login.html';  // Redirect to login if no auth token
         return;
     }
     try {
@@ -83,8 +83,8 @@ async function viewOrderDetails(orderId) {
         });
 
         if (!response.ok) {
-          if (response.status === 401) {
-                logout();
+            if (response.status === 401) {
+                logout();  // Redirect to login if unauthorized
                 return;
             }
             const errorData = await response.json();

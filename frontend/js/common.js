@@ -55,10 +55,15 @@ function isLoggedIn() {
 }
 
 function requireAuth() {
+    const currentPath = window.location.pathname;
+
+    // Check if the current path is the login page
+    if (currentPath.includes('login.html')) {
+        return; // Do not redirect if already on the login page
+    }
+
     if (!isLoggedIn()) {
         let redirectPath;
-        const currentPath = window.location.pathname;
-
         if (currentPath.includes('/views/')) {
             redirectPath = 'auth/login.html';
         } else {
@@ -67,6 +72,14 @@ function requireAuth() {
         window.location.href = redirectPath;
     }
 }
+
+// Load navbar and footer only when the page is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+    loadNavbar();
+    loadFooter();
+    requireAuth();
+});
+
 
 function logout() {
     localStorage.removeItem('authToken');
