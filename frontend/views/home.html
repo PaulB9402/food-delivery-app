@@ -16,8 +16,7 @@
             <p class="lead">Commandez vos plats préférés en ligne et faites-vous livrer rapidement.</p>
             <hr class="my-4">
             <p>Découvrez nos restaurants partenaires et profitez de nos offres spéciales.</p>
-            <a class="btn btn-danger btn-lg" href="#restaurants" role="button">Explorer les restaurants</a>
-        </div>
+            <a class="btn btn-danger btn-lg" href="restaurant.html" role="button">Explorer les restaurants</a> </div>
 
         <section id="restaurants" class="mt-5">
             <h2>Restaurants populaires</h2>
@@ -47,8 +46,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="card">
-                        <img src="./img/offer1.jpg" class="card-img-top" alt="Offre 1">
-                        <div class="card-body">
+                        <img src="./img/offer1.jpg" class="card-img-top" alt="Offre 1"> <div class="card-body">
                             <h5 class="card-title">Menu Famille</h5>
                             <p class="card-text">2 pizzas + 1 boisson pour 25€ seulement !</p>
                             <a href="#" class="btn btn-danger">Voir l'offre</a>
@@ -63,8 +61,7 @@
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <div class="card">
-                        <img src="./img/pizza.jpg" class="card-img-top" alt="Pizza">
-                        <div class="card-body">
+                        <img src="./img/pizza.jpg" class="card-img-top" alt="Pizza"> <div class="card-body">
                             <h5 class="card-title">Pizza</h5>
                         </div>
                     </div>
@@ -74,11 +71,17 @@
     </div>
 
     <div id="footer-container"></div>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          loadRestaurants();
+        });
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./js/main.js"></script>
-    <script src="./js/auth.js"></script>
-    <script src="./js/common.js"></script>
-
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', requireAuth);
+    </script>
 </body>
 </html>
