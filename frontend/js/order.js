@@ -3,20 +3,31 @@ const authToken = localStorage.getItem("authToken");
 const userId = localStorage.getItem("userId");
 
 async function loadOrders() {
+    if (!authToken || !userId) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     try {
-        const response = await fetch(`${API_BASE_URL}/orders?customerId=${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/orders?customerId=${userId}`, {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
         if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des commandes.");
+          if (response.status === 401) {
+                logout();
+                return;
+            }
+            const errorData = await response.json();
+            const errorMessage = errorData.message || "Erreur lors de la récupération des commandes.";
+            throw new Error(errorMessage);
         }
 
         const orders = await response.json();
         displayOrders(orders);
     } catch (error) {
         console.error(error);
-        alert("Impossible de charger les commandes.");
+        alert("Impossible de charger les commandes. " + error.message);
     }
 }
 
@@ -28,6 +39,10 @@ function displayOrders(orders) {
     pastOrdersContainer.innerHTML = "";
 
     orders.forEach(order => {
+      if (!order || !order.restaurant) {
+          console.error("Invalid order data:", order);
+          return;
+      }
         const orderCard = `
             <div class="col-md-6 mb-4">
                 <div class="card">
@@ -48,16 +63,33 @@ function displayOrders(orders) {
             ongoingOrdersContainer.innerHTML += orderCard;
         }
     });
+
+    if (ongoingOrdersContainer.innerHTML === "") {
+        ongoingOrdersContainer.innerHTML = "<p>Aucune commande en cours.</p>";
+    }
+     if (pastOrdersContainer.innerHTML === "") {
+        pastOrdersContainer.innerHTML = "<p>Aucune commande passée.</p>";
+    }
 }
 
 async function viewOrderDetails(orderId) {
+     if (!authToken) {
+        window.location.href = 'login.html';
+        return;
+    }
     try {
-        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
         if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des détails de la commande.");
+          if (response.status === 401) {
+                logout();
+                return;
+            }
+            const errorData = await response.json();
+            const errorMessage = errorData.message || "Erreur lors de la récupération des détails de la commande.";
+            throw new Error(errorMessage);
         }
 
         const order = await response.json();
@@ -83,7 +115,7 @@ async function viewOrderDetails(orderId) {
         new bootstrap.Modal(document.getElementById("orderDetailsModal")).show();
     } catch (error) {
         console.error(error);
-        alert("Impossible de charger les détails de la commande.");
+        alert("Impossible de charger les détails de la commande." + error.message);
     }
 }
 

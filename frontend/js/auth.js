@@ -1,25 +1,15 @@
 const BASE_URL = "http://localhost:8080";
 
 const loginForm = document.getElementById('login-form');
-const loginEmail = loginForm.querySelector('input[type="email"]');
-const loginPassword = loginForm.querySelector('input[type="password"]');
-const loginRole = loginForm.querySelector('#role');
-
-
 const registerForm = document.getElementById('register-form');
-const registerUsername = registerForm.querySelector('input[name="username"]');
-const registerEmail = registerForm.querySelector('input[type="email"]');
-const registerPassword = registerForm.querySelector('input[type="password"]');
-const registerConfirmPassword = registerForm.querySelector('input[name="confirm-password"]');
-const registerRole = registerForm.querySelector('#role');
 
 
 async function handleLogin(event) {
     event.preventDefault();
 
-    const email = loginEmail.value;
-    const password = loginPassword.value;
-    const role = loginRole.value;
+    const email = document.querySelector('#login-form input[type="email"]').value;
+    const password = document.querySelector('#login-form input[type="password"]').value;
+    const role = document.querySelector('#login-form #role').value;
 
     if (!role) {
         alert('Veuillez sélectionner un rôle.');
@@ -27,7 +17,7 @@ async function handleLogin(event) {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/users/login`, {
+        const response = await fetch(`${BASE_URL}/api/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,18 +30,24 @@ async function handleLogin(event) {
         });
 
         if (!response.ok) {
-            throw new Error('Échec de la connexion');
+          const errorData = await response.json();
+          const errorMessage = errorData.message || 'Échec de la connexion';
+          throw new Error(errorMessage);
         }
 
         const data = await response.json();
         const token = data.token;
+        const userId = data.userId;
+
 
         localStorage.setItem('authToken', token);
         localStorage.setItem('userRole', role);
+        localStorage.setItem('userId', userId);
+
 
         switch (role) {
             case 'CLIENT':
-                window.location.href = 'index.html';
+                window.location.href = 'home.html';
                 break;
             case 'RESTAURANT':
                 window.location.href = 'restaurant-dashboard.html';
@@ -60,21 +56,22 @@ async function handleLogin(event) {
                 window.location.href = 'admin.html';
                 break;
             default:
-                window.location.href = 'index.html';
+                window.location.href = 'home.html';
         }
     } catch (error) {
         console.error('Erreur lors de la connexion:', error);
-        alert('Échec de la connexion. Veuillez vérifier vos identifiants.');
+        document.getElementById('login-error').textContent = error.message;
+        document.getElementById('login-error').style.display = 'block';
+
     }
 }
 async function handleRegister(event) {
     event.preventDefault();
-
-    const username = registerUsername.value;
-    const email = registerEmail.value;
-    const password = registerPassword.value;
-    const confirmPassword = registerConfirmPassword.value;
-    const role = registerRole.value;
+    const username = document.querySelector('#register-form input[name="firstName"]').value +" "+ document.querySelector('#register-form input[name="lastName"]').value;
+    const email = document.querySelector('#register-form input[type="email"]').value;
+    const password = document.querySelector('#register-form input[type="password"]').value;
+    const confirmPassword = document.querySelector('#register-form input[name="confirmPassword"]').value;
+    const role = document.querySelector('#register-form #role').value;
 
     if (password !== confirmPassword) {
         alert('Les mots de passe ne correspondent pas.');
@@ -87,7 +84,7 @@ async function handleRegister(event) {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/users/register`, {
+        const response = await fetch(`${BASE_URL}/api/users/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -101,7 +98,9 @@ async function handleRegister(event) {
         });
 
         if (!response.ok) {
-            throw new Error('Échec de l\'inscription');
+          const errorData = await response.json();
+          const errorMessage = errorData.message || "Échec de l'inscription";
+          throw new Error(errorMessage);
         }
 
         const data = await response.json();
@@ -110,7 +109,8 @@ async function handleRegister(event) {
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Erreur lors de l\'inscription:', error);
-        alert('Échec de l\'inscription. Veuillez réessayer.');
+        document.getElementById('registration-error').textContent = error.message;
+        document.getElementById('registration-error').style.display = 'block';
     }
 }
 
@@ -120,4 +120,11 @@ if (loginForm) {
 
 if (registerForm) {
     registerForm.addEventListener('submit', handleRegister);
+}
+
+function logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
+    window.location.href = 'login.html';
 }

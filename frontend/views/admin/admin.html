@@ -28,7 +28,8 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="user-table"></tbody>
+            <tbody id="user-table">
+                </tbody>
         </table>
 
         <h2 class="mt-5">Gestion des Restaurants</h2>
@@ -42,11 +43,36 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="restaurant-table"></tbody>
+            <tbody id="restaurant-table">
+              </tbody>
         </table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/admin.js"></script>
+    <script src="..\..\js\admin.js"></script>
+    <script>
+      // Example of how you'd populate the user table (in admin.js)
+      // This is just a placeholder; you'd use fetch() to get the data
+      /*
+      fetch('/api/users') // Replace with your actual API endpoint
+          .then(response => response.json())
+          .then(users => {
+              const userTable = document.getElementById('user-table');
+              users.forEach(user => {
+                  const row = userTable.insertRow();
+                  row.innerHTML = `
+                      <td>${user.id}</td>
+                      <td>${user.name}</td>
+                      <td>${user.email}</td>
+                      <td>${user.role}</td>
+                      <td>
+                          <button class="btn btn-warning btn-sm">Modifier</button>
+                          <button class="btn btn-danger btn-sm">Supprimer</button>
+                      </td>
+                  `;
+              });
+          });
+      */
+    </script>
 </body>
 </html>
