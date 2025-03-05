@@ -1,4 +1,3 @@
-// auth.js
 const API_BASE_URL = "http://localhost:8080";
 
 const loginForm = document.getElementById('login-form');
@@ -21,7 +20,7 @@ async function handleLogin(event) {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/api/users/login`, {
+        const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -89,7 +88,7 @@ async function handleRegister(event) {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/api/users/register`, {
+        const response = await fetch(`${API_BASE_URL}/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -132,3 +131,4 @@ function logout() {
     localStorage.removeItem('userId');
     window.location.href = 'login.html';
 }
+
