@@ -50,16 +50,16 @@ async function handleLogin(event) {
 
         switch (role) {
             case 'CLIENT':
-                window.location.href = 'home.html';
+                window.location.href = '../home.html';
                 break;
             case 'RESTAURANT':
-                window.location.href = 'restaurant-dashboard.html';
+                window.location.href = '../restaurant-dashboard.html';
                 break;
             case 'ADMIN':
-                window.location.href = 'admin.html';
+                window.location.href = '../admin.html';
                 break;
             default:
-                window.location.href = 'home.html';
+                window.location.href = '../home.html';
         }
     } catch (error) {
         console.error('Erreur lors de la connexion:', error);

@@ -4,7 +4,7 @@ const userId = localStorage.getItem("userId");
 
 async function loadOrders() {
     if (!authToken || !userId) {
-        window.location.href = 'login.html';
+        window.location.href = './views/auth/login.html';
         return;
     }
 

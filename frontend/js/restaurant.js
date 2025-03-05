@@ -1,27 +1,43 @@
 const API_BASE_URL = "http://localhost:8080";
 
 let cart = [];
-let currentRestaurantId = null;
+let currentRestaurantId = null; // Store the ID of the restaurant for the current order.
 
 const restaurantList = document.getElementById("restaurant-list");
 
 const urlParams = new URLSearchParams(window.location.search);
 const searchTerm = urlParams.get("search") || "";
+const restaurantId = urlParams.get("id");
 
 async function fetchRestaurants() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/restaurants`);
-          if (!response.ok) {
-            const errorData = await response.json();
-            const errorMessage = errorData.message || "Erreur lors de la récupération des restaurants";
-            throw new Error(errorMessage);
-          }
-        const restaurants = await response.json();
-        displayRestaurants(restaurants);
-    } catch (error) {
-        console.error("Erreur lors de la récupération des restaurants :", error);
-        restaurantList.innerHTML = `<p class="text-danger">⚠️ Impossible de charger les restaurants. ${error.message}</p>`;
+  try {
+    let url = `${API_BASE_URL}/restaurants`;
+    if (restaurantId) {
+      url = `${API_BASE_URL}/restaurants/${restaurantId}`;
     }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorData = await response.json();
+      const errorMessage =
+        errorData.message || "Erreur lors de la récupération des restaurants";
+      throw new Error(errorMessage);
+    }
+    const restaurants = await response.json();
+    if (restaurantId) {
+      displayRestaurant(restaurants); // Display single restaurant
+    }
+    else{
+        displayRestaurants(restaurants);
+
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des restaurants :",
+      error
+    );
+    restaurantList.innerHTML = `<p class="text-danger">⚠️ Impossible de charger les restaurants. ${error.message}</p>`; //Display error
+  }
 }
 
 function displayRestaurants(restaurants) {
@@ -32,7 +48,7 @@ function displayRestaurants(restaurants) {
         filteredRestaurants = restaurants.filter(restaurant =>
             restaurant.name.toLowerCase().includes(lowerSearchTerm) ||
             restaurant.cuisine.toLowerCase().includes(lowerSearchTerm) ||
-            restaurant.foodItems.some(dish => dish.name.toLowerCase().includes(lowerSearchTerm))
+            restaurant.foodItems.some(dish => dish.name.toLowerCase().includes(lowerSearchTerm)) // Correct dish filtering
         );
         document.getElementById("search-term").textContent = `Résultats pour : "${searchTerm}"`;
     } else {
@@ -63,7 +79,7 @@ function displayRestaurants(restaurants) {
 }
 async function viewRestaurant(id) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/restaurants/${id}`);
+        const response = await fetch(`${API_BASE_URL}/restaurants/${id}`);
         if (!response.ok) {
             const errorData = await response.json();
             const errorMessage = errorData.message || "Erreur lors de la récupération du menu";
@@ -86,7 +102,7 @@ async function viewRestaurant(id) {
             menuList.appendChild(listItem);
         });
 
-        currentRestaurantId = restaurant.id;
+        currentRestaurantId = restaurant.id; // Set the current restaurant ID
         const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
         menuModal.show();
     } catch (error) {
@@ -94,21 +110,54 @@ async function viewRestaurant(id) {
         alert("Erreur lors de la récupération du menu. " + error.message)
     }
 }
+function displayRestaurant(restaurant) {
+      document.getElementById("modal-restaurant-name").textContent =
+        restaurant.name;
+      document.getElementById("modal-restaurant-cuisine").textContent =
+        restaurant.cuisine;
 
+      const menuList = document.getElementById("modal-menu-list");
+      menuList.innerHTML = "";
+      restaurant.foodItems.forEach((dish) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add(
+          "list-group-item",
+          "d-flex",
+          "justify-content-between",
+          "align-items-center"
+        );
+        listItem.innerHTML = `
+                ${dish.name} - ${dish.price}€
+                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id},'${dish.name}', ${dish.price}, ${restaurant.id} )">Ajouter</button>
+            `;
+        menuList.appendChild(listItem);
+      });
+      currentRestaurantId = restaurant.id; // Set the current restaurant ID
+
+      // Show the modal
+      const menuModal = new bootstrap.Modal(
+        document.getElementById("menuModal")
+      );
+      menuModal.show();
+}
 function addToCart(dishId, dishName, price, restaurantId) {
+     // Check if the cart is empty or if the new item is from the same restaurant
     if (cart.length > 0 && currentRestaurantId !== restaurantId) {
         alert("Vous ne pouvez ajouter que des plats d'un seul restaurant à la fois. Veuillez vider votre panier ou finaliser votre commande actuelle.");
         return;
     }
+    // Find the item in the cart
     const existingItem = cart.find(item => item.dishId === dishId);
 
     if (existingItem) {
+        // If the item exists, increase the quantity
         existingItem.quantity++;
     } else {
+        // If the item doesn't exist, add it to the cart
         cart.push({ dishId, dishName, price, quantity: 1, restaurantId });
     }
 
-    currentRestaurantId = restaurantId;
+    currentRestaurantId = restaurantId; // Ensure currentRestaurantId is updated
     alert(`"${dishName}" ajouté au panier !`);
     console.log(cart);
 }
@@ -143,14 +192,14 @@ function viewCart() {
 function removeFromCart(index) {
     cart.splice(index, 1);
      if (cart.length === 0) {
-        currentRestaurantId = null;
+        currentRestaurantId = null; // Reset restaurant ID if cart is empty
     }
     viewCart();
 }
 
 function clearCart() {
     cart = [];
-    currentRestaurantId = null;
+    currentRestaurantId = null; // Reset restaurant ID
     viewCart();
 }
 
@@ -160,7 +209,7 @@ async function placeOrder() {
 
     if (!authToken || !userId) {
         alert("Vous devez être connecté pour passer une commande.");
-        window.location.href = 'login.html';
+        window.location.href = 'login.html'; // Redirect to login
         return;
     }
      if (cart.length === 0) {
@@ -178,32 +227,33 @@ async function placeOrder() {
             quantity: item.quantity
         }));
 
-        const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        const response = await fetch(`${API_BASE_URL}/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
             body: JSON.stringify({
-                customerId: parseInt(userId),
-                restaurantId: currentRestaurantId,
+                customerId: parseInt(userId), // Ensure userId is a number
+                restaurantId: currentRestaurantId, // Use the stored restaurant ID
                 items: orderItems
             })
         });
 
         if (!response.ok) {
             if (response.status === 401) {
-                logout();
+                logout(); //clear everything
                 return;
             }
-            const errorData = await response.json();
+            const errorData = await response.json(); //get message
             const errorMessage = errorData.message ||  "Erreur lors de la création de la commande.";
             throw new Error(errorMessage);
         }
 
         const newOrder = await response.json();
         alert(`Commande passée avec succès! Numéro de commande: ${newOrder.id}`);
-        clearCart();
+        clearCart();  // Clear the cart after successful order.
+        //  Redirect to the orders page to show the new order.
         window.location.href = 'orders.html';
 
 
@@ -212,5 +262,4 @@ async function placeOrder() {
         alert('Failed to place order. ' + error.message);
     }
 }
-
 document.addEventListener("DOMContentLoaded", fetchRestaurants);
