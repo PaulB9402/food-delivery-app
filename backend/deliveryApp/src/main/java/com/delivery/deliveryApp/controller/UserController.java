@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.delivery.deliveryApp.model.User;
+import java.util.Optional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.delivery.deliveryApp.repository.UserRepository;
+
+
+
 
 @RestController
 @RequestMapping("/users")
@@ -27,6 +33,15 @@ public class UserController {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+   
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -45,5 +60,22 @@ public class UserController {
 
         String token = jwtTokenProvider.generateToken(user.getUsername(), roles);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
+        // Vérifier si l'utilisateur existe déjà
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
+            return ResponseEntity.badRequest().body("Username is already taken.");
+        }
+
+        // Hacher le mot de passe
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Enregistrer l'utilisateur
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User registered successfully.");
     }
 }
