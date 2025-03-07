@@ -7,7 +7,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div id="navbar-container"></div>
+  <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">FoodDelivery</a>
+        <form class="d-flex" action="restaurant.html" method="GET" id="searchForm">
+            <input class="form-control me-2" type="search" name="search" placeholder="Rechercher un restaurant, un plat...">
+            <button class="btn btn-light" type="submit">Rechercher</button>
+        </form>
+        <div class="navbar-nav">
+            <a class="nav-link" href="profile.html">Mon Profil</a>
+            <a class="nav-link" href="orders.html">Mes Commandes</a>
+            <a class="nav-link" href="./auth/login.html">Connexion</a>
+            <a class="nav-link" href="#" onclick="logout()">Déconnexion</a>
+        </div>
+    </div>
+</nav>
 
 
     <div class="container mt-4">
@@ -59,7 +73,41 @@
                 </div>
             </div>
         </div>
-    <div id="footer-container"></div>
+        <footer class="bg-light text-center text-lg-start mt-5">
+            <div class="container p-4">
+              <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                  <h5 class="text-uppercase">FoodDelivery</h5>
+                  <p>
+                    Votre service de livraison de repas préféré.
+                  </p>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                  <h5 class="text-uppercase">Liens</h5>
+                  <ul class="list-unstyled mb-0">
+                    <li>
+                      <a href="#!" class="text-dark">À propos</a>
+                    </li>
+                    <li>
+                      <a href="#!" class="text-dark">Contact</a>
+                    </li>
+                    <li>
+                      <a href="#!" class="text-dark">FAQ</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                  <h5 class="text-uppercase">Suivez-nous</h5>
+                    <a href="#!" class="text-dark me-3">Facebook</a>
+                    <a href="#!" class="text-dark me-3">Twitter</a>
+                    <a href="#!" class="text-dark">Instagram</a>
+                </div>
+              </div>
+            </div>
+            <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+              © 2025 FoodDelivery
+            </div>
+          </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
      <script src="../js/common.js"></script>
     <script src="../js/profile.js"></script>

@@ -1,7 +1,7 @@
 const API_BASE_URL = "http://localhost:8080";
 
 let cart = [];
-let currentRestaurantId = null; // Store the ID of the restaurant for the current order.
+let currentRestaurantId = null;
 
 const restaurantList = document.getElementById("restaurant-list");
 
@@ -25,7 +25,7 @@ async function fetchRestaurants() {
     }
     const restaurants = await response.json();
     if (restaurantId) {
-      displayRestaurant(restaurants); // Display single restaurant
+      displayRestaurant(restaurants);
     }
     else{
         displayRestaurants(restaurants);
@@ -36,7 +36,7 @@ async function fetchRestaurants() {
       "Erreur lors de la récupération des restaurants :",
       error
     );
-    restaurantList.innerHTML = `<p class="text-danger">⚠️ Impossible de charger les restaurants. ${error.message}</p>`; //Display error
+    restaurantList.innerHTML = `<p class="text-danger">⚠️ Impossible de charger les restaurants. ${error.message}</p>`;
   }
 }
 
@@ -48,7 +48,7 @@ function displayRestaurants(restaurants) {
         filteredRestaurants = restaurants.filter(restaurant =>
             restaurant.name.toLowerCase().includes(lowerSearchTerm) ||
             restaurant.cuisine.toLowerCase().includes(lowerSearchTerm) ||
-            restaurant.foodItems.some(dish => dish.name.toLowerCase().includes(lowerSearchTerm)) // Correct dish filtering
+            restaurant.foodItems.some(dish => dish.name.toLowerCase().includes(lowerSearchTerm))
         );
         document.getElementById("search-term").textContent = `Résultats pour : "${searchTerm}"`;
     } else {
@@ -102,7 +102,7 @@ async function viewRestaurant(id) {
             menuList.appendChild(listItem);
         });
 
-        currentRestaurantId = restaurant.id; // Set the current restaurant ID
+        currentRestaurantId = restaurant.id;
         const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
         menuModal.show();
     } catch (error) {
@@ -132,16 +132,15 @@ function displayRestaurant(restaurant) {
             `;
         menuList.appendChild(listItem);
       });
-      currentRestaurantId = restaurant.id; // Set the current restaurant ID
+      currentRestaurantId = restaurant.id;
 
-      // Show the modal
+
       const menuModal = new bootstrap.Modal(
         document.getElementById("menuModal")
       );
       menuModal.show();
 }
 function addToCart(dishId, dishName, price, restaurantId) {
-     // Check if the cart is empty or if the new item is from the same restaurant
     if (cart.length > 0 && currentRestaurantId !== restaurantId) {
         alert("Vous ne pouvez ajouter que des plats d'un seul restaurant à la fois. Veuillez vider votre panier ou finaliser votre commande actuelle.");
         return;

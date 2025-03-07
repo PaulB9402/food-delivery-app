@@ -1,7 +1,7 @@
 const BASE_URL = "http://localhost:8080"; // Keep this here
 
 function loadNavbar() {
-    fetch('../navbar.html') // Adjust path if needed
+    fetch('../views/navbar.html') // Adjust path if needed
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -16,7 +16,7 @@ function loadNavbar() {
 }
 
 function loadFooter() {
-    fetch('../footer.html') // Adjust path if needed
+    fetch('../views/footer.html') // Adjust path if needed
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -54,19 +54,18 @@ function isLoggedIn() {
     return localStorage.getItem('authToken') !== null && localStorage.getItem('userId') !== null;
 }
 
-function requireAuth() {
-    if (!isLoggedIn()) {
-        let redirectPath;
-        const currentPath = window.location.pathname;
-
-        if (currentPath.includes('/views/')) {
-            redirectPath = 'auth/login.html';
-        } else {
-            redirectPath = 'views/auth/login.html';
-        }
-        window.location.href = redirectPath;
-    }
-}
+// function requireAuth() {
+//    if (!isLoggedIn()) {
+//        let redirectPath;
+//        const currentPath = window.location.pathname;
+//
+//        if (currentPath.includes('/views/')) {
+//            redirectPath = 'auth/login.html';
+//        } else {
+//            redirectPath = 'views/auth/login.html';
+//        window.location.href = redirectPath;
+//    }
+//}}
 
 function logout() {
     localStorage.removeItem('authToken');

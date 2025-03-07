@@ -18,7 +18,7 @@ async function handleLogin(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/login`, {
+        const response = await fetch(`${API_BASE_URL}/users/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: email, password, role }),
@@ -74,7 +74,7 @@ async function handleRegister(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/register`, {
+        const response = await fetch(`${API_BASE_URL}/users/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password, role }),

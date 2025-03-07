@@ -3,10 +3,10 @@ const authToken = localStorage.getItem("authToken");
 const userId = localStorage.getItem("userId");
 
 async function loadOrders() {
-    if (!authToken || !userId) {
-        window.location.href = './views/auth/login.html';
+    /*if (!authToken || !userId) {
+        window.location.href = './auth/login.html';
         return;
-    }
+    }*/
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/orders?customerId=${userId}`, {
