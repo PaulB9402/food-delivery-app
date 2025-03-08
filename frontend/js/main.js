@@ -1,28 +1,37 @@
 const API_BASE_URL = "http://localhost:8080";
-const authToken = localStorage.getItem("authToken");
 
 function loadRestaurants() {
-    if (!authToken) {
-        window.location.href = './views/auth/login.html';
+    const authToken = localStorage.getItem("authToken");
+    const userRole = localStorage.getItem("userRole");
+
+    // 1. Vérifier l'authentification ET les permissions
+    if (!authToken || !userRole) {
+        window.location.href = './auth/login.html';
         return;
     }
 
-    console.log("Loading restaurants...");
+    // 2. Vérifier le rôle avant même de faire la requête
+    if (userRole !== "ADMIN" && userRole !== "RESTAURANT" && userRole !== "DELIVERY" && userRole !== "CLIENT") {
+        alert("Vous n'avez pas les permissions nécessaires");
+        window.location.href = './home.html';
+        return;
+    }
+
+    console.log("Chargement des restaurants...");
 
     fetch(`${API_BASE_URL}/restaurants`, {
-        headers: { "Authorization": `Bearer ${authToken}` }
+        headers: {
+            "Authorization": `Bearer ${authToken}`,
+            "Content-Type": "application/json"
+        }
     })
     .then(response => {
-        console.log("Response status:", response.status); // Debugging
-
-        // Gérer les erreurs d'authentification
+        // 3. Gestion centralisée des erreurs
         if (response.status === 401 || response.status === 403) {
             logout();
-            window.location.href = './views/auth/login.html';
-            return;
+            throw new Error("Session expirée ou accès refusé");
         }
 
-        // Gérer les autres erreurs
         if (!response.ok) {
             throw new Error(`Erreur HTTP: ${response.status}`);
         }
@@ -33,6 +42,11 @@ function loadRestaurants() {
         const restaurantList = document.getElementById("restaurant-list");
         restaurantList.innerHTML = "";
 
+        // 4. Ajout d'une vérification de sécurité
+        if (!Array.isArray(restaurants)) {
+            throw new Error("Format de réponse inattendu");
+        }
+
         restaurants.forEach(restaurant => {
             const card = `
                 <div class="col-md-4 mb-4">
@@ -40,8 +54,13 @@ function loadRestaurants() {
                         <img src="${restaurant.image}" class="card-img-top" alt="${restaurant.name}">
                         <div class="card-body">
                             <h5 class="card-title">${restaurant.name}</h5>
-                            <p class="card-text">Cuisine : ${restaurant.cuisine}</p>
-                            <a href="restaurant-details.html?name=${restaurant.name}" class="btn btn-danger">Voir le menu</a>
+                            <p class="card-text">${restaurant.cuisine}</p>
+                            <p class="text-muted">Livraison: ${restaurant.deliveryTime}</p>
+                            <button class="btn btn-danger"
+                                    onclick="viewRestaurant(${restaurant.id})"
+                                    data-testid="restaurant-${restaurant.id}">
+                                Voir le menu
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -50,14 +69,34 @@ function loadRestaurants() {
         });
     })
     .catch(error => {
-        console.error("Error loading restaurants:", error);
-        alert("Erreur lors du chargement des restaurants. Veuillez réessayer.");
+        // 5. Gestion d'erreur améliorée
+        console.error("Erreur critique:", error);
+
+        if (error.message.includes("accès refusé")) {
+            alert("Votre session a expiré. Veuillez vous reconnecter.");
+            logout();
+        } else {
+            alert(`Erreur technique: ${error.message}`);
+        }
     });
 }
 
 function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userId');
+    // 6. Nettoyage complet
+    localStorage.clear();
+    document.cookie.split(";").forEach(cookie => {
+        const [name] = cookie.trim().split("=");
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
     window.location.href = './views/auth/login.html';
 }
+
+// Initialisation sécurisée
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        loadRestaurants();
+    } catch (error) {
+        console.error("Erreur d'initialisation:", error);
+        logout();
+    }
+});
