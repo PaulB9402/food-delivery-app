@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Livreur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div id="navbar-container"></div>
+
+    <div class="container mt-5">
+        <h2 class="text-center">Tableau de bord - Livreur</h2>
+
+        <h4 class="mt-4">Commandes à livrer</h4>
+        <div class="row" id="pending-orders"></div>
+
+        <h4 class="mt-5">Commandes en cours de livraison</h4>
+        <div class="row" id="active-orders"></div>
+
+        <h4 class="mt-5">Historique des livraisons</h4>
+        <div class="row" id="delivered-orders"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script src="../js/delivery.js"></script>
+</body>
+</html>

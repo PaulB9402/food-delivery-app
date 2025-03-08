@@ -1,3 +1,6 @@
+import { requireAuth } from './auth.js';
+document.addEventListener('DOMContentLoaded', requireAuth);
+
 const API_BASE_URL = "http://localhost:8080";
 
 let cart = [];

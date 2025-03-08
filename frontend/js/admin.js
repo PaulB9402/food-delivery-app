@@ -1,9 +1,11 @@
+import { requireAuth } from './auth.js';
+document.addEventListener('DOMContentLoaded', requireAuth);
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 
 async function loadUsers() {
     if (!authToken) {
-        window.location.href = './login.html';  // Redirect to login if no auth token
+        window.location.href = './auth/login.html';  // Redirect to login if no auth token
         return;
     }
 
