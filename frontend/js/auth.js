@@ -47,7 +47,7 @@ async function handleLogin(event) {
                 window.location.href = '../restaurant-dashboard.html';
                 break;
             case 'ADMIN':
-                window.location.href = '../admin.html';
+                window.location.href = '../admin/admin.html';
                 break;
             default:
                 window.location.href = '../home.html';
