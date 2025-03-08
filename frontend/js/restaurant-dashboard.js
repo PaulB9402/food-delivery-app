@@ -4,21 +4,51 @@ const userId = localStorage.getItem("userId");
 
 let restaurantId = null;
 
-
+/** ==========================
+ *  AJOUTER LE JWT AUX REQUÊTES
+ *  ========================== */
 function getAuthHeaders() {
     if (!authToken) {
         alert("Votre session a expiré. Veuillez vous reconnecter.");
         window.location.href = "../auth/login.html";
         return null;
     }
-
     return {
         "Authorization": `Bearer ${authToken}`,
         "Content-Type": "application/json"
     };
 }
 
+/** ==========================
+ *  CHARGER LE RESTAURANT
+ *  ========================== */
+async function loadRestaurant() {
+    const headers = getAuthHeaders();
+    if (!headers) return;
 
+    try {
+        const response = await fetch(`${API_BASE_URL}/restaurants/user/${userId}`, { headers });
+
+        if (!response.ok) throw new Error("Erreur lors de la récupération du restaurant.");
+
+        const restaurants = await response.json();
+
+        if (restaurants.length === 0) {
+            alert("Aucun restaurant associé à ce compte.");
+            return;
+        }
+
+        restaurantId = restaurants[0].id;
+        loadDishes(); // Charger les plats du restaurant
+    } catch (error) {
+        console.error(error);
+        alert("Impossible de charger le restaurant.");
+    }
+}
+
+/** ==========================
+ *  CHARGER LES COMMANDES
+ *  ========================== */
 async function loadOrders() {
     const headers = getAuthHeaders();
     if (!headers) return;
@@ -54,57 +84,9 @@ async function loadOrders() {
     }
 }
 
-
-async function loadCustomers() {
-    const headers = getAuthHeaders();
-    if (!headers) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/users`, { headers });
-
-        if (!response.ok) throw new Error("Erreur lors de la récupération des clients.");
-
-        const customers = await response.json();
-        const recipientSelect = document.getElementById("message-recipient");
-        recipientSelect.innerHTML = "";
-
-        customers.forEach(customer => {
-            const option = document.createElement("option");
-            option.value = customer.id;
-            option.textContent = customer.name;
-            recipientSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error(error);
-        alert("Impossible de charger les clients.");
-    }
-}
-
-
-async function loadRestaurant() {
-    const headers = getAuthHeaders();
-    if (!headers) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/restaurants/user/${userId}`, { headers });
-
-        if (!response.ok) throw new Error("Erreur lors de la récupération du restaurant.");
-
-        const restaurants = await response.json();
-        if (restaurants.length === 0) {
-            alert("Aucun restaurant associé à ce compte.");
-            return;
-        }
-
-        restaurantId = restaurants[0].id;
-        loadDishes();
-    } catch (error) {
-        console.error(error);
-        alert("Impossible de charger le restaurant.");
-    }
-}
-
-
+/** ==========================
+ *  CHARGER LES PLATS DU RESTAURANT
+ *  ========================== */
 async function loadDishes() {
     if (!restaurantId) return;
     const headers = getAuthHeaders();
@@ -123,6 +105,9 @@ async function loadDishes() {
     }
 }
 
+/** ==========================
+ *  AFFICHER LES PLATS
+ *  ========================== */
 function displayDishes(dishes) {
     const dishList = document.getElementById("dish-list");
     dishList.innerHTML = "";
@@ -136,7 +121,7 @@ function displayDishes(dishes) {
         const dishCard = `
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="${dish.imageUrl || 'default.jpg'}" class="card-img-top" alt="${dish.name}">
+                    <img src="${dish.photos ? dish.photos.split(',')[0] : 'default.jpg'}" class="card-img-top" alt="${dish.name}">
                     <div class="card-body">
                         <h5 class="card-title">${dish.name}</h5>
                         <p class="card-text">${dish.description}</p>
@@ -149,7 +134,9 @@ function displayDishes(dishes) {
     });
 }
 
-
+/** ==========================
+ *  AJOUTER UN PLAT
+ *  ========================== */
 document.getElementById("add-dish-form").addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -160,23 +147,30 @@ document.getElementById("add-dish-form").addEventListener("submit", async (event
 
     const name = document.getElementById("dish-name").value;
     const description = document.getElementById("dish-description").value;
-    const price = document.getElementById("dish-price").value;
+    const price = parseFloat(document.getElementById("dish-price").value);
     const imageFile = document.getElementById("dish-image").files[0];
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("price", price);
-    formData.append("restaurantId", restaurantId);
-    if (imageFile) {
-        formData.append("image", imageFile);
+    if (!imageFile) {
+        alert("Veuillez ajouter une image.");
+        return;
     }
+
+    // Convertir l'image en Base64
+    const imageBase64 = await convertToBase64(imageFile);
+
+    const foodItem = {
+        name,
+        description,
+        price,
+        photos: imageBase64,
+        restaurantId
+    };
 
     try {
         const response = await fetch(`${API_BASE_URL}/food-items`, {
             method: "POST",
-            headers: { "Authorization": `Bearer ${authToken}` },
-            body: formData
+            headers: getAuthHeaders(),
+            body: JSON.stringify(foodItem)
         });
 
         if (!response.ok) throw new Error("Erreur lors de l'ajout du plat.");
@@ -189,9 +183,22 @@ document.getElementById("add-dish-form").addEventListener("submit", async (event
     }
 });
 
+/** ==========================
+ *  CONVERTIR UNE IMAGE EN BASE64
+ *  ========================== */
+function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+    });
+}
 
+/** ==========================
+ *  INITIALISATION
+ *  ========================== */
 document.addEventListener("DOMContentLoaded", () => {
     loadRestaurant();
     loadOrders();
-    loadCustomers();
 });

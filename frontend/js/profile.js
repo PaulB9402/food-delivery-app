@@ -1,243 +1,179 @@
 const API_BASE_URL = "http://localhost:8080";
-const authToken = localStorage.getItem('authToken');
-const userId = localStorage.getItem('userId');
+const authToken = localStorage.getItem("authToken");
+const userId = localStorage.getItem("userId");
+
+
+function getAuthHeaders() {
+    if (!authToken) {
+        alert("Votre session a expiré. Veuillez vous reconnecter.");
+        window.location.href = "../auth/login.html";
+        return null;
+    }
+    return {
+        "Authorization": `Bearer ${authToken}`,
+        "Content-Type": "application/json"
+    };
+}
+
 
 async function loadUserProfile() {
-    if (!authToken || !userId) {
-        window.location.href = 'auth/login.html'; // Redirect if not logged in and correct path
-        return;
-    }
+    const headers = getAuthHeaders();
+    if (!headers || !userId) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, { headers });
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                logout();
-                return;
-            }
-            const errorData = await response.json();
-            const errorMessage = errorData.message || "Erreur lors de la récupération du profil.";
-            throw new Error(errorMessage);
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération du profil.");
 
         const user = await response.json();
         displayUserProfile(user);
-        loadOrderHistory(); // Load order history after profile data
-        loadAddresses(); // Load addresses
-
+        loadOrderHistory();
+        loadAddresses();
     } catch (error) {
-        console.error('Error loading user profile:', error);
-        alert('Failed to load user profile. ' + error.message);
+        console.error("Erreur lors du chargement du profil:", error);
+        alert("Impossible de charger votre profil.");
     }
 }
 
+
 function displayUserProfile(user) {
-    // Correctly set the values of the input fields using their names
-    document.querySelector('#profile-form input[name="name"]').value = user.name || '';
-    document.querySelector('#profile-form input[name="email"]').value = user.email || '';
-    document.querySelector('#profile-form input[name="phone"]').value = user.phone || '';
+    document.querySelector('#profile-form input[name="name"]').value = user.name || "";
+    document.querySelector('#profile-form input[name="email"]').value = user.email || "";
+    document.querySelector('#profile-form input[name="phone"]').value = user.phone || "";
 }
+
+
 async function handleProfileUpdate(event) {
     event.preventDefault();
 
-    const updatedName = document.querySelector('#profile-form input[name="name"]').value; // Use name attribute
-    const updatedEmail = document.querySelector('#profile-form input[name="email"]').value; // Use name attribute
-    const updatedPhone = document.querySelector('#profile-form input[name="phone"]').value;   // Use name attribute
+    const headers = getAuthHeaders();
+    if (!headers) return;
+
+    const updatedProfile = {
+        name: document.querySelector('#profile-form input[name="name"]').value.trim(),
+        email: document.querySelector('#profile-form input[name="email"]').value.trim(),
+        phone: document.querySelector('#profile-form input[name="phone"]').value.trim()
+    };
 
     try {
         const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-            method: 'PUT', //  Use PUT for updating
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({
-                name: updatedName,
-                email: updatedEmail,
-                phone: updatedPhone
-            })
+            method: "PUT",
+            headers,
+            body: JSON.stringify(updatedProfile)
         });
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                logout(); //clear everything
-                return;
-            }
-            const errorData = await response.json(); //get message
-            const errorMessage = errorData.message || "Erreur lors de la mise à jour du profil.";
-            throw new Error(errorMessage);
-        }
+        if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil.");
 
-        alert('Profil mis à jour avec succès!');
-        // Optionally, re-fetch the user data to reflect changes immediately.
+        alert("Profil mis à jour avec succès !");
         loadUserProfile();
-
     } catch (error) {
-        console.error('Error updating profile:', error);
-        alert('Failed to update profile.' + error.message);
+        console.error("Erreur lors de la mise à jour du profil:", error);
+        alert("Impossible de mettre à jour votre profil.");
     }
 }
 
+
 async function loadOrderHistory() {
-    if (!authToken || !userId) {
-        window.location.href = 'auth/login.html';//correct path
-        return;
-    }
+    const headers = getAuthHeaders();
+    if (!headers) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/orders?customerId=${userId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
+        const response = await fetch(`${API_BASE_URL}/orders/customer/${userId}`, { headers });
 
-        if (!response.ok) {
-             if (response.status === 401) {
-                logout(); //clear everything
-                return;
-            }
-            const errorData = await response.json(); //get message
-            const errorMessage = errorData.message ||  "Erreur lors du chargement de l'historique des commandes";
-            throw new Error(errorMessage);
-        }
+        if (!response.ok) throw new Error("Erreur lors du chargement des commandes.");
 
         const orders = await response.json();
         displayOrderHistory(orders);
-
     } catch (error) {
-        console.error('Error loading order history:', error);
-        alert('Failed to load order history.' + error.message);
+        console.error("Erreur lors du chargement des commandes:", error);
+        alert("Impossible de charger l'historique des commandes.");
     }
 }
-function displayOrderHistory(orders) {
-    const orderHistoryContainer = document.getElementById('order-history');
-    orderHistoryContainer.innerHTML = ''; // Clear previous content
 
-    if (orders.length === 0) {
-        orderHistoryContainer.innerHTML = '<p>Aucune commande précédente.</p>';
+
+function displayOrderHistory(orders) {
+    const orderHistoryContainer = document.getElementById("order-history");
+    orderHistoryContainer.innerHTML = "";
+
+    if (!orders.length) {
+        orderHistoryContainer.innerHTML = "<p>Aucune commande trouvée.</p>";
         return;
     }
 
-    const listGroup = document.createElement('div');
-    listGroup.classList.add('list-group');
-
     orders.forEach(order => {
-        // Handle missing restaurant information gracefully.
-        const restaurantName = order.restaurant ? order.restaurant.name : 'Restaurant inconnu';
-
-        const orderItem = document.createElement('a');
-        orderItem.href = '#'; //  Add a link if you want to make it clickable (e.g., to view order details)
-        orderItem.classList.add('list-group-item', 'list-group-item-action');
-        orderItem.innerHTML = `
-            <div class="d-flex w-100 justify-content-between">
-                <h6 class="mb-1">${restaurantName} - ${order.total}€</h6>
-                <small>${new Date(order.orderDate).toLocaleDateString()}</small>
+        const orderItem = `
+            <div class="list-group-item">
+                <h6>${order.restaurant.name} - ${order.total}€</h6>
+                <p>${order.orderItems.map(item => `${item.quantity}x ${item.foodItem.name}`).join(", ")}</p>
+                <small>Statut: <span class="badge ${order.status === "Livrée" ? "bg-success" : "bg-warning"}">${order.status}</span></small>
             </div>
-            <p class="mb-1">${order.orderItems.map(item => `${item.quantity}x ${item.foodItem.name}`).join(', ')}</p>
-            <small class="text-muted">Statut: ${order.status}</small>
         `;
-        listGroup.appendChild(orderItem);
+        orderHistoryContainer.innerHTML += orderItem;
     });
-
-    orderHistoryContainer.appendChild(listGroup);
 }
-
 
 
 async function loadAddresses() {
-     if (!authToken || !userId) {
-        window.location.href = 'auth/login.html'; //correct path
-        return;
-    }
+    const headers = getAuthHeaders();
+    if (!headers) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/addresses`, {  //  Endpoint for user addresses
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/addresses`, { headers });
 
-        if (!response.ok) {
-             if (response.status === 401) {
-                logout(); //clear everything
-                return;
-            }
-            const errorData = await response.json(); //get message
-            const errorMessage = errorData.message || "Erreur lors du chargement des adresses.";
-            throw new Error(errorMessage);
-        }
+        if (!response.ok) throw new Error("Erreur lors du chargement des adresses.");
 
         const addresses = await response.json();
         displayAddresses(addresses);
-
     } catch (error) {
-        console.error('Error loading addresses:', error);
-        alert('Failed to load addresses. ' + error.message);
+        console.error("Erreur lors du chargement des adresses:", error);
+        alert("Impossible de charger les adresses.");
     }
 }
 
-function displayAddresses(addresses) {
-    const addressesContainer = document.querySelector('#addresses-container .list-group'); // Corrected selector
-     if (!addressesContainer) {
-        console.error("Addresses container not found!");  // Debugging
-        return; // Exit if container doesn't exist.
-    }
-    addressesContainer.innerHTML = ''; // Clear existing addresses
 
-    if (addresses.length === 0) {
-        addressesContainer.innerHTML = '<div class="list-group-item">Aucune adresse enregistrée.</div>';
+function displayAddresses(addresses) {
+    const addressesContainer = document.querySelector("#addresses-container .list-group");
+    addressesContainer.innerHTML = "";
+
+    if (!addresses.length) {
+        addressesContainer.innerHTML = "<p>Aucune adresse enregistrée.</p>";
         return;
     }
 
     addresses.forEach(address => {
-        const addressItem = document.createElement('div');
-        addressItem.classList.add('list-group-item');
-        addressItem.innerHTML = `
-            ${address.street}, ${address.city}, ${address.zipCode}
-            <button class="btn btn-sm btn-danger float-end" onclick="deleteAddress(${address.id})">Supprimer</button>
+        const addressItem = `
+            <div class="list-group-item">
+                ${address.street}, ${address.city}, ${address.zipCode}
+                <button class="btn btn-sm btn-danger float-end" onclick="deleteAddress(${address.id})">Supprimer</button>
+            </div>
         `;
-        addressesContainer.appendChild(addressItem);
+        addressesContainer.innerHTML += addressItem;
     });
 }
 
 
 async function deleteAddress(addressId) {
-    if (!authToken) {
-        window.location.href = 'login.html';
-        return;
-    }
+    const headers = getAuthHeaders();
+    if (!headers) return;
 
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette adresse?')) {
-        return;
-    }
+    if (!confirm("Voulez-vous vraiment supprimer cette adresse ?")) return;
 
     try {
         const response = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${authToken}` }
+            method: "DELETE",
+            headers
         });
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                logout(); //clear everything
-                return;
-            }
-            const errorData = await response.json(); //get message
-            const errorMessage = errorData.message ||  "Erreur lors de la suppression de l'adresse.";
-            throw new Error(errorMessage);
-        }
+        if (!response.ok) throw new Error("Erreur lors de la suppression de l'adresse.");
 
-        // Reload addresses after successful deletion
+        alert("Adresse supprimée avec succès !");
         loadAddresses();
-        alert('Adresse supprimée avec succès.');
-
     } catch (error) {
-        console.error('Error deleting address:', error);
-        alert('Failed to delete address. ' + error.message);
+        console.error("Erreur lors de la suppression de l'adresse:", error);
+        alert("Impossible de supprimer l'adresse.");
     }
 }
 
-// Add event listener for the profile update form.  Make sure this matches your HTML.
-document.getElementById('profile-form').addEventListener('submit', handleProfileUpdate);
 
-// Load user data when the page loads
-document.addEventListener('DOMContentLoaded', loadUserProfile);
+document.addEventListener("DOMContentLoaded", loadUserProfile);
+document.getElementById("profile-form").addEventListener("submit", handleProfileUpdate);
