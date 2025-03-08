@@ -7,29 +7,39 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div id="navbar-container"></div>
-
-
+    <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">FoodDelivery</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="restaurant-dashboard.html">Commandes</a>
+                <a class="nav-link" href="restaurant-messages.html">Messages</a>
+                <a class="nav-link active" href="restaurant-profile.html">Profil</a>
+                <a class="nav-link" href="#" id="logout">Déconnexion</a>
+            </div>
+        </div>
+    </nav>
     <div class="container mt-4">
+        <h2 class="text-center">Mon Profil</h2>
+
         <div class="row">
             <div class="col-md-4">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header bg-danger text-white">
                         <h5>Informations personnelles</h5>
                     </div>
                     <div class="card-body">
                         <form id="profile-form">
                             <div class="mb-3">
-                                <label>Nom complet</label>
-                                <input type="text" class="form-control" name="name">
+                                <label class="form-label">Nom complet</label>
+                                <input type="text" class="form-control" name="name" required>
                             </div>
                             <div class="mb-3">
-                                <label>Email</label>
-                                <input type="email" class="form-control" name="email">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" required>
                             </div>
                             <div class="mb-3">
-                                <label>Téléphone</label>
-                                <input type="tel" class="form-control" name="phone">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-control" name="phone" required>
                             </div>
                             <button type="submit" class="btn btn-danger w-100">Mettre à jour</button>
                         </form>
@@ -38,28 +48,29 @@
             </div>
 
             <div class="col-md-8">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header bg-danger text-white">
                         <h5>Historique des commandes</h5>
                     </div>
                     <div class="card-body" id="order-history">
-                        </div>
+                        <p class="text-muted">Chargement des commandes...</p>
                     </div>
                 </div>
 
-                <div class="card mt-4">
-                    <div class="card-header bg-danger text-white">
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                         <h5>Adresses enregistrées</h5>
+                        <button class="btn btn-light btn-sm" onclick="addAddress()">+ Ajouter</button>
                     </div>
-                    <div class="card-body" id="addresses-container">
-                            <div class="list-group">
-                            <button class="btn btn-outline-danger mt-3 w-100">+ Ajouter une adresse</button>
-                       </div>
+                    <div class="card-body">
+                        <div class="list-group" id="addresses-container">
+                            <p class="text-muted">Chargement des adresses...</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    <div id="footer-container"></div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
      <script src="../js/common.js"></script>
     <script src="../js/profile.js"></script>
