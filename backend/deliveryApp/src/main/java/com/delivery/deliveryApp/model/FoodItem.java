@@ -2,7 +2,6 @@ package com.delivery.deliveryApp.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 @Data
 @Entity
 @Table(name = "food_items")
@@ -26,4 +25,8 @@ public class FoodItem {
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
+    
+    @ManyToOne
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
 }
