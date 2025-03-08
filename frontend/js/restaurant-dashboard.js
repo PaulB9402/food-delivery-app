@@ -1,6 +1,9 @@
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
-const restaurantId = localStorage.getItem("userId"); // Supposons que l'ID du restaurant est stocké après login
+const userId = localStorage.getItem("userId");
+
+let restaurantId = null;
+
 
 async function loadOrders() {
     try {
@@ -36,29 +39,6 @@ async function loadOrders() {
     }
 }
 
-async function loadCustomers() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/users`, {
-            headers: { "Authorization": `Bearer ${authToken}` }
-        });
-
-        if (!response.ok) throw new Error("Erreur lors de la récupération des clients.");
-
-        const customers = await response.json();
-        const recipientSelect = document.getElementById("message-recipient");
-        recipientSelect.innerHTML = "";
-
-        customers.forEach(customer => {
-            const option = document.createElement("option");
-            option.value = customer.id;
-            option.textContent = customer.name;
-            recipientSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error(error);
-        alert("Impossible de charger les clients.");
-    }
-}
 
 async function viewOrderDetails(orderId) {
     try {
@@ -94,6 +74,7 @@ async function viewOrderDetails(orderId) {
     }
 }
 
+
 document.getElementById("accept-order").addEventListener("click", async () => {
     alert("Commande acceptée !");
 });
@@ -105,6 +86,32 @@ document.getElementById("reject-order").addEventListener("click", async () => {
 document.getElementById("request-info").addEventListener("click", async () => {
     alert("Demande d'informations envoyée au client.");
 });
+
+
+async function loadCustomers() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users`, {
+            headers: { "Authorization": `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error("Erreur lors de la récupération des clients.");
+
+        const customers = await response.json();
+        const recipientSelect = document.getElementById("message-recipient");
+        recipientSelect.innerHTML = "";
+
+        customers.forEach(customer => {
+            const option = document.createElement("option");
+            option.value = customer.id;
+            option.textContent = customer.name;
+            recipientSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error(error);
+        alert("Impossible de charger les clients.");
+    }
+}
+
 
 document.getElementById("send-message-form").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -118,10 +125,7 @@ document.getElementById("send-message-form").addEventListener("submit", async (e
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             },
-            body: JSON.stringify({
-                recipientId: recipient,
-                message: message
-            })
+            body: JSON.stringify({ recipientId: recipient, message })
         });
 
         if (!response.ok) throw new Error("Erreur lors de l'envoi du message.");
@@ -133,9 +137,34 @@ document.getElementById("send-message-form").addEventListener("submit", async (e
     }
 });
 
-async function loadDishes() {
+async function loadRestaurant() {
     try {
-        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/dishes`, {
+        const response = await fetch(`${API_BASE_URL}/restaurants/user/${userId}`, {
+            headers: { "Authorization": `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error("Erreur lors de la récupération du restaurant.");
+
+        const restaurants = await response.json();
+        if (restaurants.length === 0) {
+            alert("Aucun restaurant associé à ce compte.");
+            return;
+        }
+
+        restaurantId = restaurants[0].id;
+        loadDishes();
+    } catch (error) {
+        console.error(error);
+        alert("Impossible de charger le restaurant.");
+    }
+}
+
+
+async function loadDishes() {
+    if (!restaurantId) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${restaurantId}`, {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
@@ -149,7 +178,6 @@ async function loadDishes() {
     }
 }
 
-// Afficher les plats
 function displayDishes(dishes) {
     const dishList = document.getElementById("dish-list");
     dishList.innerHTML = "";
@@ -163,7 +191,7 @@ function displayDishes(dishes) {
         const dishCard = `
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <img src="${dish.imageUrl}" class="card-img-top" alt="${dish.name}">
+                    <img src="${dish.imageUrl || 'default.jpg'}" class="card-img-top" alt="${dish.name}">
                     <div class="card-body">
                         <h5 class="card-title">${dish.name}</h5>
                         <p class="card-text">${dish.description}</p>
@@ -176,45 +204,9 @@ function displayDishes(dishes) {
     });
 }
 
-document.getElementById("add-dish-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const name = document.getElementById("dish-name").value;
-    const description = document.getElementById("dish-description").value;
-    const price = document.getElementById("dish-price").value;
-    const imageFile = document.getElementById("dish-image").files[0];
-
-    if (!imageFile) {
-        alert("Veuillez ajouter une image.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("price", price);
-    formData.append("restaurantId", restaurantId);
-    formData.append("image", imageFile);
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/dishes`, {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${authToken}` },
-            body: formData
-        });
-
-        if (!response.ok) throw new Error("Erreur lors de l'ajout du plat.");
-
-        alert("Plat ajouté avec succès !");
-        loadDishes();
-    } catch (error) {
-        console.error(error);
-        alert("Impossible d'ajouter le plat.");
-    }
-});
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadRestaurant();
     loadOrders();
     loadCustomers();
-    loadDishes();
 });
