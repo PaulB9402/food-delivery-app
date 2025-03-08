@@ -110,10 +110,19 @@ async function handleRegister(event) {
 }
 
 function logout() {
+    // Supprimer les éléments du localStorage
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
-    window.location.href = 'login.html';
+
+    // Supprimer tous les cookies
+    document.cookie.split(";").forEach(cookie => {
+        const [name] = cookie.trim().split("=");
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+
+    // Rediriger vers la page de connexion
+    window.location.href = '../auth/login.html';
 }
 
 if (loginForm) {
