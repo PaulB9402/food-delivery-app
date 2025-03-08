@@ -115,12 +115,6 @@ function logout() {
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
 
-    // Supprimer tous les cookies
-    document.cookie.split(";").forEach(cookie => {
-        const [name] = cookie.trim().split("=");
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    });
-
     // Rediriger vers la page de connexion
     window.location.href = '../auth/login.html';
 }
