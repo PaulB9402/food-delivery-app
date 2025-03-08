@@ -2,9 +2,12 @@
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 
+const userRole = localStorage.getItem('userRole');
+console.log(userRole); // Affiche le rôle de l'utilisateur
+
 function loadRestaurants() {
     if (!authToken) {
-        window.location.href = './views/auth/login.html';  // Redirect to login if no auth token
+        window.location.href = './auth/login.html';
         return;
     }
 
@@ -12,7 +15,14 @@ function loadRestaurants() {
     fetch(`${API_BASE_URL}/restaurants`, {  // Use API_BASE_URL for consistency
         headers: { "Authorization": `Bearer ${authToken}` }
     })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401) { // Token expiré ou invalide
+                logout(); // Déconnecter l'utilisateur
+                window.location.href = './views/auth/login.html'; // Rediriger vers la page de connexion
+                return;
+            }
+        return response.json();
+    })
         .then(restaurants => {
             const restaurantList = document.getElementById("restaurant-list");
             restaurantList.innerHTML = "";
