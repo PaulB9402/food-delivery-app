@@ -1,3 +1,5 @@
+import { requireAuth } from './auth.js';
+document.addEventListener('DOMContentLoaded', requireAuth);
 const BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 const userId = localStorage.getItem("userId"); // Récupération de l'ID utilisateur

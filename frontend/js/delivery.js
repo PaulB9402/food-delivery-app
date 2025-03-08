@@ -1,3 +1,5 @@
+import { requireAuth } from './auth.js';
+document.addEventListener('DOMContentLoaded', requireAuth);
 const API_BASE_URL = "http://localhost:8080"; // URL de ton backend
 const authToken = localStorage.getItem("authToken");
 const deliveryPersonId = localStorage.getItem("userId");
