@@ -1,31 +1,33 @@
-// main.js
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 
-const userRole = localStorage.getItem('userRole');
-console.log(userRole); // Affiche le rôle de l'utilisateur
-
 function loadRestaurants() {
     if (!authToken) {
-        window.location.href = './auth/login.html';
+        window.location.href = './views/auth/login.html';  // Rediriger vers la page de connexion si aucun token n'est trouvé
         return;
     }
 
     console.log("Loading restaurants..."); // Debugging log
-    fetch(`${API_BASE_URL}/restaurants`, {  // Use API_BASE_URL for consistency
+
+    fetch(`${API_BASE_URL}/restaurants`, {
         headers: { "Authorization": `Bearer ${authToken}` }
     })
         .then(response => {
             if (response.status === 401) { // Token expiré ou invalide
                 logout(); // Déconnecter l'utilisateur
-                window.location.href = './views/auth/login.html'; // Rediriger vers la page de connexion
+                window.location.href = './auth/login.html'; // Rediriger vers la page de connexion
                 return;
             }
-        return response.json();
-    })
+            if (!response.ok) {
+                throw new Error("Erreur lors du chargement des restaurants");
+            }
+            return response.json();
+        })
+        console.log("response", response)
         .then(restaurants => {
             const restaurantList = document.getElementById("restaurant-list");
-            restaurantList.innerHTML = "";
+            restaurantList.innerHTML = ""; // Vider la liste avant de la remplir
+
             restaurants.forEach(restaurant => {
                 const card = `
                     <div class="col-md-4 mb-4">
@@ -42,5 +44,15 @@ function loadRestaurants() {
                 restaurantList.innerHTML += card;
             });
         })
-        .catch(error => console.error("Error loading restaurants:", error));
+        .catch(error => {
+            console.error("Error loading restaurants:", error);
+            alert("Erreur lors du chargement des restaurants. Veuillez réessayer.");
+        });
+}
+
+function logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
+    window.location.href = './auth/login.html';
 }
