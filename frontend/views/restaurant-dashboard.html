@@ -52,6 +52,40 @@
         </div>
     </div>
 
+    <div class="container mt-5">
+        <h2>Gérer le Menu</h2>
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5>Ajouter un plat</h5>
+            </div>
+            <div class="card-body">
+                <form id="add-dish-form">
+                    <div class="mb-3">
+                        <label>Nom du plat</label>
+                        <input type="text" class="form-control" id="dish-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <textarea class="form-control" id="dish-description" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label>Prix (€)</label>
+                        <input type="number" class="form-control" id="dish-price" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Image du plat</label>
+                        <input type="file" class="form-control" id="dish-image" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Ajouter</button>
+                </form>
+            </div>
+        </div>
+
+        <h3>Plats disponibles</h3>
+        <div class="row" id="dish-list"></div>
+    </div>
+
+
     <div class="modal fade" id="orderDetailsModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
