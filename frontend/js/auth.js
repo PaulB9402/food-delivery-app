@@ -5,6 +5,16 @@ const registerForm = document.getElementById('register-form');
 
 "use strict";
 
+function requireAuth() {
+    const authToken = localStorage.getItem('authToken');
+    const userRole = localStorage.getItem('userRole');
+    const userId = localStorage.getItem('userId');
+
+    if (!authToken || !userRole || !userId) {
+        window.location.href = '../auth/login.html';
+    }
+}
+
 async function handleLogin(event) {
     event.preventDefault();
 
@@ -20,21 +30,18 @@ async function handleLogin(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/users/login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: email, password, role }),
         });
 
         if (!response.ok) {
-            // Check if the response is in JSON format and handle it
             const errorData = await response.json().catch(() => null);
             const errorMessage = errorData?.message || 'Échec de la connexion';
             throw new Error(errorMessage);
         }
 
         const data = await response.json();
-        // Store JWT in localStorage
+
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userRole', role);
         localStorage.setItem('userId', data.userId);
@@ -62,8 +69,6 @@ async function handleLogin(event) {
     }
 }
 
-
-
 async function handleRegister(event) {
     event.preventDefault();
 
@@ -86,9 +91,7 @@ async function handleRegister(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/users/register`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password, role }),
         });
 
@@ -106,7 +109,6 @@ async function handleRegister(event) {
     }
 }
 
-// For logging out, clear the stored JWT and other user data
 function logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
@@ -114,7 +116,6 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Event listeners for the login and registration forms
 if (loginForm) {
     loginForm.addEventListener('submit', handleLogin);
 }
@@ -122,3 +123,5 @@ if (loginForm) {
 if (registerForm) {
     registerForm.addEventListener('submit', handleRegister);
 }
+
+export { requireAuth, logout };
