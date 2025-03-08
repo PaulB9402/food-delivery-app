@@ -8,8 +8,21 @@
 </head>
 <body class="bg-light">
 
-    <div id="navbar-container"></div>
-
+    <script type="module">
+        import { requireAuth } from '../js/auth.js';
+        document.addEventListener('DOMContentLoaded', requireAuth);
+    </script>
+    <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">FoodDelivery</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="restaurant-dashboard.html">Commandes</a>
+                <a class="nav-link" href="restaurant-messages.html">Messages</a>
+                <a class="nav-link active" href="restaurant-profile.html">Profil</a>
+                <a class="nav-link" href="#" id="logout">Déconnexion</a>
+            </div>
+        </div>
+    </nav>
     <div class="container mt-5">
         <h2 class="text-center">Tableau de bord - Livreur</h2>
 

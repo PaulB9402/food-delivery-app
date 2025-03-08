@@ -8,6 +8,10 @@
     <link href="../css/main.css" rel="stylesheet">
 </head>
 <body>
+    <script type="module">
+        import { requireAuth } from '../js/auth.js';
+        document.addEventListener('DOMContentLoaded', requireAuth);
+    </script>
     <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="index.html">FoodDelivery</a>
@@ -72,8 +76,6 @@
     <script type="module" src="../js/auth.js"></script>
     <script src="../js/restaurant.js"></script>
     <script src="../js/common.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', requireAuth);
-    </script>
+
 </body>
 </html>
