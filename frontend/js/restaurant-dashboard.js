@@ -1,5 +1,6 @@
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
+const restaurantId = localStorage.getItem("userId"); // Supposons que l'ID du restaurant est stocké après login
 
 async function loadOrders() {
     try {
@@ -7,9 +8,7 @@ async function loadOrders() {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
-        if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des commandes.");
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération des commandes.");
 
         const orders = await response.json();
         const ordersList = document.getElementById("orders-list");
@@ -43,9 +42,7 @@ async function loadCustomers() {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
-        if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des clients.");
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération des clients.");
 
         const customers = await response.json();
         const recipientSelect = document.getElementById("message-recipient");
@@ -69,9 +66,7 @@ async function viewOrderDetails(orderId) {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
-        if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des détails de la commande.");
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération des détails de la commande.");
 
         const order = await response.json();
         const orderDetails = document.getElementById("order-details");
@@ -129,9 +124,7 @@ document.getElementById("send-message-form").addEventListener("submit", async (e
             })
         });
 
-        if (!response.ok) {
-            throw new Error("Erreur lors de l'envoi du message.");
-        }
+        if (!response.ok) throw new Error("Erreur lors de l'envoi du message.");
 
         alert(`Message envoyé à ${recipient}: ${message}`);
     } catch (error) {
@@ -140,7 +133,88 @@ document.getElementById("send-message-form").addEventListener("submit", async (e
     }
 });
 
+async function loadDishes() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/dishes`, {
+            headers: { "Authorization": `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error("Erreur lors de la récupération des plats.");
+
+        const dishes = await response.json();
+        displayDishes(dishes);
+    } catch (error) {
+        console.error(error);
+        alert("Impossible de charger le menu.");
+    }
+}
+
+// Afficher les plats
+function displayDishes(dishes) {
+    const dishList = document.getElementById("dish-list");
+    dishList.innerHTML = "";
+
+    if (dishes.length === 0) {
+        dishList.innerHTML = "<p class='text-muted'>Aucun plat disponible.</p>";
+        return;
+    }
+
+    dishes.forEach(dish => {
+        const dishCard = `
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="${dish.imageUrl}" class="card-img-top" alt="${dish.name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${dish.name}</h5>
+                        <p class="card-text">${dish.description}</p>
+                        <p class="fw-bold">${dish.price}€</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        dishList.innerHTML += dishCard;
+    });
+}
+
+document.getElementById("add-dish-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("dish-name").value;
+    const description = document.getElementById("dish-description").value;
+    const price = document.getElementById("dish-price").value;
+    const imageFile = document.getElementById("dish-image").files[0];
+
+    if (!imageFile) {
+        alert("Veuillez ajouter une image.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("restaurantId", restaurantId);
+    formData.append("image", imageFile);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/dishes`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${authToken}` },
+            body: formData
+        });
+
+        if (!response.ok) throw new Error("Erreur lors de l'ajout du plat.");
+
+        alert("Plat ajouté avec succès !");
+        loadDishes();
+    } catch (error) {
+        console.error(error);
+        alert("Impossible d'ajouter le plat.");
+    }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     loadOrders();
     loadCustomers();
+    loadDishes();
 });

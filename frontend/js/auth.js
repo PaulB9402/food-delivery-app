@@ -20,8 +20,8 @@ async function handleLogin(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/users/login`, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ username: email, password, role }),
         });
@@ -48,6 +48,9 @@ async function handleLogin(event) {
                 break;
             case 'ADMIN':
                 window.location.href = '../admin/admin.html';
+                break;
+            case 'DELIVERY':
+                window.location.href = '../delivery-dashboard.html';
                 break;
             default:
                 window.location.href = '../home.html';
@@ -83,8 +86,8 @@ async function handleRegister(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/users/register`, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ username, email, password, role }),
         });
