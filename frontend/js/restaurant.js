@@ -1,7 +1,7 @@
 const API_BASE_URL = "http://localhost:8080";
 
 let cart = [];
-let currentRestaurantId = null; // Store the ID of the restaurant for the current order.
+let currentRestaurantId = null;
 
 const restaurantList = document.getElementById("restaurant-list");
 
@@ -10,13 +10,15 @@ const searchTerm = urlParams.get("search") || "";
 const restaurantId = urlParams.get("id");
 
 async function fetchRestaurants() {
-  try {
-    let url = `${API_BASE_URL}/restaurants`;
-    if (restaurantId) {
-      url = `${API_BASE_URL}/restaurants/${restaurantId}`;
-    }
+    const authToken = localStorage.getItem('authToken');
 
-    const response = await fetch(url);
+  try {
+    const response = await fetch(`${API_BASE_URL}/restaurants`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+
     if (!response.ok) {
       const errorData = await response.json();
       const errorMessage =
@@ -25,7 +27,7 @@ async function fetchRestaurants() {
     }
     const restaurants = await response.json();
     if (restaurantId) {
-      displayRestaurant(restaurants); // Display single restaurant
+      displayRestaurant(restaurants);
     }
     else{
         displayRestaurants(restaurants);
@@ -36,7 +38,7 @@ async function fetchRestaurants() {
       "Erreur lors de la récupération des restaurants :",
       error
     );
-    restaurantList.innerHTML = `<p class="text-danger">⚠️ Impossible de charger les restaurants. ${error.message}</p>`; //Display error
+    restaurantList.innerHTML = `<p class="text-danger">⚠️ Impossible de charger les restaurants. ${error.message}</p>`;
   }
 }
 
@@ -48,7 +50,7 @@ function displayRestaurants(restaurants) {
         filteredRestaurants = restaurants.filter(restaurant =>
             restaurant.name.toLowerCase().includes(lowerSearchTerm) ||
             restaurant.cuisine.toLowerCase().includes(lowerSearchTerm) ||
-            restaurant.foodItems.some(dish => dish.name.toLowerCase().includes(lowerSearchTerm)) // Correct dish filtering
+            restaurant.foodItems.some(dish => dish.name.toLowerCase().includes(lowerSearchTerm))
         );
         document.getElementById("search-term").textContent = `Résultats pour : "${searchTerm}"`;
     } else {
@@ -66,80 +68,75 @@ function displayRestaurants(restaurants) {
                             <h5 class="card-title">${restaurant.name}</h5>
                             <p class="card-text">Cuisine : ${restaurant.cuisine}</p>
                             <p class="card-text">Plats : ${restaurant.foodItems.map(item => item.name).join(", ")}</p>
-                            <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
+                            <button class="btn btn-danger" data-restaurant-id="${restaurant.id}">Voir le menu</button>
                         </div>
                     </div>
                 </div>
             `;
             restaurantList.innerHTML += card;
         });
+
+        document.querySelectorAll('.btn-danger[data-restaurant-id]').forEach(button => {
+            button.addEventListener('click', () => {
+                const restaurantId = button.getAttribute('data-restaurant-id');
+                viewRestaurant(restaurantId);
+            });
+        });
     } else {
         restaurantList.innerHTML = '<p class="text-muted">❌ Aucun restaurant trouvé.</p>';
     }
 }
 async function viewRestaurant(id) {
+    const authToken = localStorage.getItem('authToken'); // Récupérer le token JWT
+
     try {
-        const response = await fetch(`${API_BASE_URL}/restaurants/${id}`);
+        // Faire la requête API avec le token d'authentification
+        const response = await fetch(`${API_BASE_URL}/restaurants/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}` // Ajouter le token dans les en-têtes
+            }
+        });
+
+        // Vérifier si la réponse est OK
         if (!response.ok) {
             const errorData = await response.json();
             const errorMessage = errorData.message || "Erreur lors de la récupération du menu";
             throw new Error(errorMessage);
         }
+
+        // Récupérer les données du restaurant
         const restaurant = await response.json();
 
+        // Afficher le nom et le type de cuisine du restaurant dans la modale
         document.getElementById("modal-restaurant-name").textContent = restaurant.name;
         document.getElementById("modal-restaurant-cuisine").textContent = restaurant.cuisine;
 
+        // Afficher les plats du restaurant dans la modale
         const menuList = document.getElementById("modal-menu-list");
-        menuList.innerHTML = "";
+        menuList.innerHTML = ""; // Vider la liste actuelle
+
         restaurant.foodItems.forEach(dish => {
             const listItem = document.createElement("li");
             listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
             listItem.innerHTML = `
                 ${dish.name} - ${dish.price}€
-                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id},'${dish.name}', ${dish.price}, ${restaurant.id} )">Ajouter</button>
+                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name}', ${dish.price}, ${restaurant.id})">Ajouter</button>
             `;
             menuList.appendChild(listItem);
         });
 
-        currentRestaurantId = restaurant.id; // Set the current restaurant ID
+        // Mettre à jour l'ID du restaurant actuel
+        currentRestaurantId = restaurant.id;
+
+        // Ouvrir la modale
         const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
         menuModal.show();
     } catch (error) {
         console.error("Erreur lors de la récupération du menu :", error);
-        alert("Erreur lors de la récupération du menu. " + error.message)
+        alert("Erreur lors de la récupération du menu. " + error.message);
     }
 }
-function displayRestaurant(restaurant) {
-      document.getElementById("modal-restaurant-name").textContent =
-        restaurant.name;
-      document.getElementById("modal-restaurant-cuisine").textContent =
-        restaurant.cuisine;
 
-      const menuList = document.getElementById("modal-menu-list");
-      menuList.innerHTML = "";
-      restaurant.foodItems.forEach((dish) => {
-        const listItem = document.createElement("li");
-        listItem.classList.add(
-          "list-group-item",
-          "d-flex",
-          "justify-content-between",
-          "align-items-center"
-        );
-        listItem.innerHTML = `
-                ${dish.name} - ${dish.price}€
-                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id},'${dish.name}', ${dish.price}, ${restaurant.id} )">Ajouter</button>
-            `;
-        menuList.appendChild(listItem);
-      });
-      currentRestaurantId = restaurant.id; // Set the current restaurant ID
-
-      // Show the modal
-      const menuModal = new bootstrap.Modal(
-        document.getElementById("menuModal")
-      );
-      menuModal.show();
-}
 function addToCart(dishId, dishName, price, restaurantId) {
      // Check if the cart is empty or if the new item is from the same restaurant
     if (cart.length > 0 && currentRestaurantId !== restaurantId) {
