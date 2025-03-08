@@ -1,543 +1,626 @@
 {
   "info": {
-      "name": "Food Delivery API Tests",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "Food Delivery API Tests",
+    "_postman_id": "12345-67890-abcdef",
+    "description": "Collection of API tests for the Food Delivery application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
-      {
-          "name": "Authentication",
-          "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
               {
-                  "name": "Register User",
-                  "request": {
-                      "method": "POST",
-                      "header": [
-                          {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                          }
-                      ],
-                      "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"role\": \"{{user_role}}\"\n}"
-                      },
-                      "url": {
-                          "raw": "{{base_url}}/users/register",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "users",
-                              "register"
-                          ]
-                      },
-                      "response": []
-                  }
-              },
-              {
-                  "name": "Login User",
-                  "request": {
-                      "method": "POST",
-                      "header": [
-                          {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                          }
-                      ],
-                      "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{user_password}}\"\n}"
-                      },
-                      "url": {
-                          "raw": "{{base_url}}/users/login",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "users",
-                              "login"
-                          ]
-                      },
-                      "response": [],
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "description": "Obtain JWT token after successful authentication",
-                       "event": [
-                          {
-                              "listen": "test",
-                              "script": {
-                                  "id": "0b863777-7d84-454d-87ef-fc49d5916d7c",
-                                  "exec": [
-                                       "const response = pm.response.text();",
-                                      "pm.environment.set(\"authToken\", response);",
-                                      "console.log(response)"
-                                  ],
-                                  "type": "text/javascript"
-                              }
-                          }
-                      ]
-                  }
+                "key": "Content-Type",
+                "value": "application/json"
               }
-          ]
-      },
-      {
-          "name": "UserController",
-          "item": [
-              {
-                  "name": "Get User by ID",
-                  "request": {
-                      "method": "GET",
-                      "url": {
-                          "raw": "{{base_url}}/users/{{user_id}}",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "users",
-                              "{{user_id}}"
-                          ]
-                      },
-                      "response": []
-                  }
-              }
-          ]
-      },
-      {
-          "name": "RestaurantController",
-          "item": [
-              {
-                  "name": "Create Restaurant",
-                  "request": {
-                      "method": "POST",
-                      "header": [
-                          {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                          }
-                      ],
-                      "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"name\": \"{{restaurant_name}}\",\n  \"address\": \"{{restaurant_address}}\",\n  \"phone\": \"{{restaurant_phone}}\",\n  \"deliveryConstraints\": \"{{restaurant_delivery_constraints}}\"\n}"
-                      },
-                      "url": {
-                          "raw": "{{base_url}}/restaurants",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "restaurants"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              },
-              {
-                  "name": "Get Restaurant by ID",
-                  "request": {
-                      "method": "GET",
-                      "url": {
-                          "raw": "{{base_url}}/restaurants/{{restaurant_id}}",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "restaurants",
-                              "{{restaurant_id}}"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              }
-          ]
-      },
-      {
-          "name": "FoodItemController",
-          "item": [
-              {
-                  "name": "Create Food Item",
-                  "request": {
-                      "method": "POST",
-                      "header": [
-                          {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                          }
-                      ],
-                      "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"name\": \"{{food_item_name}}\",\n  \"description\": \"{{food_item_description}}\",\n  \"price\": {{food_item_price}},\n  \"photos\": \"{{food_item_photos}}\",\n  \"restaurantId\": {{restaurant_id}}\n}"
-                      },
-                      "url": {
-                          "raw": "{{base_url}}/food-items",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "food-items"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              },
-              {
-                  "name": "Get Food Item by ID",
-                  "request": {
-                      "method": "GET",
-                      "url": {
-                          "raw": "{{base_url}}/food-items/{{food_item_id}}",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "food-items",
-                              "{{food_item_id}}"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              },
-              {
-                  "name": "Search Food Items",
-                  "request": {
-                      "method": "GET",
-                      "url": {
-                          "raw": "{{base_url}}/food-items/search?name={{food_item_name}}",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "food-items",
-                              "search"
-                          ],
-                          "query": [
-                              {
-                                  "key": "name",
-                                  "value": "{{food_item_name}}"
-                              }
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              }
-          ]
-      },
-      {
-          "name": "OrderController",
-          "item": [
-              {
-                  "name": "Place Order",
-                  "request": {
-                      "method": "POST",
-                      "header": [
-                          {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                          }
-                      ],
-                      "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"customerId\": {{user_id}},\n  \"restaurantId\": {{restaurant_id}},\n  \"orderItems\": [\n    {\n      \"foodItemId\": {{food_item_id}},\n      \"quantity\": 1,\n      \"customization\": \"No customization\"\n    }\n  ]\n}"
-                      },
-                      "url": {
-                          "raw": "{{base_url}}/orders/place",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "orders",
-                              "place"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              },
-              {
-                  "name": "Get Order by ID",
-                  "request": {
-                      "method": "GET",
-                      "url": {
-                          "raw": "{{base_url}}/orders/{{order_id}}",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "orders",
-                              "{{order_id}}"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              }
-          ]
-      },
-      {
-          "name": "DeliveryController",
-          "item": [
-              {
-                  "name": "Create Delivery",
-                  "request": {
-                      "method": "POST",
-                      "header": [
-                          {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                          }
-                      ],
-                      "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"orderId\": {{order_id}},\n  \"deliveryPersonId\": {{delivery_person_id}},\n  \"status\": \"PENDING\"\n}"
-                      },
-                      "url": {
-                          "raw": "{{base_url}}/deliveries",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "deliveries"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              },
-              {
-                  "name": "Get Delivery By Id",
-                  "request": {
-                      "method": "GET",
-                      "url": {
-                          "raw": "{{base_url}}/deliveries/{{delivery_id}}",
-                          "host": [
-                              "{{base_url}}"
-                          ],
-                          "path": [
-                              "deliveries",
-                              "{{delivery_id}}"
-                          ]
-                      },
-                       "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-                      "response": []
-                  }
-              }
-          ]
-      },
-      {
-        "name": "ReviewController",
-        "item": [
-          {
-            "name": "Create Review",
-            "request": {
-              "method": "POST",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"role\": \"{{user_role}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/register",
+              "host": [
+                "{{base_url}}"
               ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"customerId\": {{user_id}},\n  \"restaurantId\": {{restaurant_id}},\n  \"rating\": 5,\n  \"comment\": \"Great food and service!\"\n}"
-              },
-              "url": {
-                "raw": "{{base_url}}/reviews",
-                "host": [
-                  "{{base_url}}"
-                ],
-                "path": [
-                  "reviews"
-                ]
-              },
-               "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                              {
-                                  "key": "token",
-                                  "value": "{{authToken}}",
-                                  "type": "string"
-                              }
-                          ]
-                      },
-              "response": []
-            }
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "response": []
           }
-        ]
-      }
-  ],
-  "variable": [
-      {
-          "key": "base_url",
-          "value": "http://localhost:8080"
-      },
-      {
-          "key": "username",
-          "value": "test_user"
-      },
-      {
-          "key": "user_email",
-          "value": "test@example.com"
-      },
-      {
-          "key": "user_password",
-          "value": "password123"
-      },
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
               {
-          "key": "user_role",
-          "value": "ADMIN"
-      },
-      {
-          "key": "restaurant_name",
-          "value": "Test Restaurant"
-      },
-      {
-          "key": "restaurant_address",
-          "value": "Test Address"
-      },
-      {
-          "key": "restaurant_phone",
-          "value": "123-456-7890"
-      },
-      {
-          "key": "restaurant_delivery_constraints",
-          "value": "Min $20"
-      },
-      {
-          "key": "food_item_name",
-          "value": "Test Food"
-      },
-      {
-          "key": "food_item_description",
-          "value": "Delicious Food"
-      },
-      {
-          "key": "food_item_price",
-          "value": "9.99"
-      },
-      {
-          "key": "food_item_photos",
-          "value": "test.jpg"
-      },
-      {
-          "key": "user_id",
-          "value": "1"
-      },
-      {
-          "key": "restaurant_id",
-          "value": "1"
-      },
-      {
-          "key": "food_item_id",
-          "value": "1"
-      },
-      {
-          "key": "order_id",
-          "value": "1"
-      },
-      {
-          "key": "delivery_person_id",
-          "value": "1"
-      },
-      {
-          "key": "delivery_id",
-          "value": "1"
-      },
-      {
-          "key": "authToken",
-          "value": ""
-      }
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{user_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Restaurant",
+      "item": [
+        {
+          "name": "Create Restaurant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"address\": \"123 Main St, Anytown\",\n  \"phone\": \"555-1234\",\n  \"deliveryConstraints\": \"Minimum order $15\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/restaurants",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "restaurants"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Restaurants by User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/restaurants/user/{{userId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "restaurants",
+                "user",
+                "{{userId}}"
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Create Menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Menu du Jour\",\n  \"restaurantId\": \"{{restaurantId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/menus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Add Food Item to Menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus/{{menuId}}/add-food-item/{{foodItemId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus",
+                "{{menuId}}",
+                "add-food-item",
+                "{{foodItemId}}"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Menus by Restaurant",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus/restaurant/{{restaurantId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus",
+                "restaurant",
+                "{{restaurantId}}"
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food Item",
+      "item": [
+        {
+          "name": "Create Food Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pepperoni Pizza\",\n  \"description\": \"Classic pepperoni pizza with mozzarella\",\n  \"price\": 15.99,\n  \"photos\": \"pepperoni_pizza.jpg\",\n  \"restaurantId\": \"{{restaurantId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/food-items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "food-items"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Search Food Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/food-items/search?name={{name}}&description={{description}}&restaurantId={{restaurantId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "food-items",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "{{name}}"
+                },
+                {
+                  "key": "description",
+                  "value": "{{description}}"
+                },
+                {
+                  "key": "restaurantId",
+                  "value": "{{restaurantId}}"
+                }
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"restaurantId\": \"{{restaurantId}}\",\n  \"orderItems\": [\n    {\n      \"foodItemId\": \"{{foodItemId}}\",\n      \"quantity\": 2,\n      \"customization\": \"Extra cheese\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Orders by Customer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/customer/{{customerId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "customer",
+                "{{customerId}}"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Orders by Restaurant",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/restaurant/{{restaurantId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "restaurant",
+                "{{restaurantId}}"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Place Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/place",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "place"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Pay Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"paymentDetails\": \"{{paymentDetails}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/pay",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "pay"
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delivery",
+      "item": [
+        {
+          "name": "Assign Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"deliveryPersonId\": \"{{deliveryPersonId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/deliveries/assign",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "deliveries",
+                "assign"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Update Delivery Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryId\": \"{{deliveryId}}\",\n  \"status\": \"{{status}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/deliveries/update-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "deliveries",
+                "update-status"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Delivery by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/deliveries/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "deliveries",
+                "{{id}}"
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Review",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"restaurantId\": \"{{restaurantId}}\",\n  \"deliveryId\": \"{{deliveryId}}\",\n  \"foodItemId\": \"{{foodItemId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great food!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reviews"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Reviews by Restaurant",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reviews/restaurant/{{restaurantId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reviews",
+                "restaurant",
+                "{{restaurantId}}"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Reviews by Delivery",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reviews/delivery/{{deliveryId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reviews",
+                "delivery",
+                "{{deliveryId}}"
+              ]
+            },
+            "response": []
+          }
+        },
+        {
+          "name": "Get Reviews by Food Item",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reviews/food-item/{{foodItemId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reviews",
+                "food-item",
+                "{{foodItemId}}"
+              ]
+            },
+            "response": []
+          }
+        }
+      ]
+    }
   ]
 }

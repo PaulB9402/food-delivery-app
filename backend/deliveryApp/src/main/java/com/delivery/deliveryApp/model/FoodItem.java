@@ -2,6 +2,7 @@ package com.delivery.deliveryApp.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 @Data
 @Entity
 @Table(name = "food_items")

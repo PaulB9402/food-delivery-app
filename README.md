@@ -42,21 +42,21 @@ Project backend security has been deactivated ! See gradlew.bat and seek a comme
 ## Configuration
 The application can be configured using the `application.properties` file located in the `src/main/resources` directory.
 
-## API Documentation
+### API Documentation
 
-### Guide des Endpoints et Exemples de Code pour le Frontend
+### Guide of Endpoints and Code Examples for the Frontend
 
-Voici un guide des endpoints disponibles dans votre application backend, ainsi que des exemples de code pour les appeler depuis le frontend.
+Here is a guide of the available endpoints in your backend application, along with code examples to call them from the frontend.
 
 #### 1. **UserController**
 
 ##### Endpoints
 
-- **Enregistrement d'un utilisateur**
-  - **Méthode** : `POST`
-  - **URL** : `/users/register`
-  - **Description** : Enregistre un nouvel utilisateur.
-  - **Exemple de requête** :
+- **Register a user**
+  - **Method**: `POST`
+  - **URL**: `/users/register`
+  - **Description**: Registers a new user.
+  - **Request Example**:
     ```json
     {
       "username": "john_doe",
@@ -66,11 +66,11 @@ Voici un guide des endpoints disponibles dans votre application backend, ainsi q
     }
     ```
 
-- **Connexion d'un utilisateur**
-  - **Méthode** : `POST`
-  - **URL** : `/users/login`
-  - **Description** : Connecte un utilisateur et retourne un token JWT.
-  - **Exemple de requête** :
+- **Login a user**
+  - **Method**: `POST`
+  - **URL**: `/users/login`
+  - **Description**: Logs in a user and returns a JWT token.
+  - **Request Example**:
     ```json
     {
       "username": "john_doe",
@@ -78,7 +78,7 @@ Voici un guide des endpoints disponibles dans votre application backend, ainsi q
     }
     ```
 
-##### Exemple de Code Frontend
+##### Frontend Code Example
 
 ```javascript
 async function registerUser(user) {
@@ -106,11 +106,11 @@ async function loginUser(user) {
 
 ##### Endpoints
 
-- **Créer un restaurant**
-  - **Méthode** : `POST`
-  - **URL** : `/restaurants`
-  - **Description** : Crée un nouveau restaurant.
-  - **Exemple de requête** :
+- **Create a restaurant**
+  - **Method**: `POST`
+  - **URL**: `/restaurants`
+  - **Description**: Creates a new restaurant.
+  - **Request Example**:
     ```json
     {
       "name": "La Belle Pizza",
@@ -121,12 +121,12 @@ async function loginUser(user) {
     }
     ```
 
-- **Obtenir les restaurants par utilisateur**
-  - **Méthode** : `GET`
-  - **URL** : `/restaurants/user/{userId}`
-  - **Description** : Récupère les restaurants associés à un utilisateur.
+- **Get restaurants by user**
+  - **Method**: `GET`
+  - **URL**: `/restaurants/user/{userId}`
+  - **Description**: Retrieves the restaurants associated with a user.
 
-##### Exemple de Code Frontend
+##### Frontend Code Example
 
 ```javascript
 async function createRestaurant(restaurant) {
@@ -153,11 +153,11 @@ async function getRestaurantsByUser(userId) {
 
 ##### Endpoints
 
-- **Créer un menu**
-  - **Méthode** : `POST`
-  - **URL** : `/menus`
-  - **Description** : Crée un nouveau menu pour un restaurant.
-  - **Exemple de requête** :
+- **Create a menu**
+  - **Method**: `POST`
+  - **URL**: `/menus`
+  - **Description**: Creates a new menu for a restaurant.
+  - **Request Example**:
     ```json
     {
       "name": "Menu du Jour",
@@ -165,12 +165,17 @@ async function getRestaurantsByUser(userId) {
     }
     ```
 
-- **Ajouter un item de nourriture à un menu**
-  - **Méthode** : `POST`
-  - **URL** : `/menus/{menuId}/add-food-item/{foodItemId}`
-  - **Description** : Ajoute un item de nourriture à un menu.
+- **Add a food item to a menu**
+  - **Method**: `POST`
+  - **URL**: `/menus/{menuId}/add-food-item/{foodItemId}`
+  - **Description**: Adds a food item to a menu.
 
-##### Exemple de Code Frontend
+- **Get menus by restaurant**
+  - **Method**: `GET`
+  - **URL**: `/menus/restaurant/{restaurantId}`
+  - **Description**: Retrieves the menus associated with a restaurant.
+
+##### Frontend Code Example
 
 ```javascript
 async function createMenu(menu) {
@@ -192,33 +197,40 @@ async function addFoodItemToMenu(menuId, foodItemId) {
     });
     return response.json();
 }
+
+async function getMenusByRestaurant(restaurantId) {
+    const response = await fetch(`${API_BASE_URL}/menus/restaurant/${restaurantId}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    return response.json();
+}
 ```
 
 #### 4. **FoodItemController**
 
 ##### Endpoints
 
-- **Créer un item de nourriture**
-  - **Méthode** : `POST`
-  - **URL** : `/food-items`
-  - **Description** : Crée un nouvel item de nourriture.
-  - **Exemple de requête** :
+- **Create a food item**
+  - **Method**: `POST`
+  - **URL**: `/food-items`
+  - **Description**: Creates a new food item.
+  - **Request Example**:
     ```json
     {
       "name": "Pizza Margherita",
-      "description": "Tomate, mozzarella, basilic",
+      "description": "Tomato, mozzarella, basil",
       "price": 12.99,
       "photos": "margherita1.jpg,margherita2.jpg",
       "restaurantId": 1
     }
     ```
 
-- **Rechercher des items de nourriture**
-  - **Méthode** : `GET`
-  - **URL** : `/food-items/search`
-  - **Description** : Recherche des items de nourriture par nom, description ou restaurant.
+- **Search food items**
+  - **Method**: `GET`
+  - **URL**: `/food-items/search`
+  - **Description**: Searches for food items by name, description, or restaurant.
 
-##### Exemple de Code Frontend
+##### Frontend Code Example
 
 ```javascript
 async function createFoodItem(foodItem) {
@@ -245,11 +257,11 @@ async function searchFoodItems(query) {
 
 ##### Endpoints
 
-- **Créer une commande**
-  - **Méthode** : `POST`
-  - **URL** : `/orders`
-  - **Description** : Crée une nouvelle commande.
-  - **Exemple de requête** :
+- **Create an order**
+  - **Method**: `POST`
+  - **URL**: `/orders`
+  - **Description**: Creates a new order.
+  - **Request Example**:
     ```json
     {
       "customerId": 1,
@@ -264,12 +276,27 @@ async function searchFoodItems(query) {
     }
     ```
 
-- **Obtenir les commandes par client**
-  - **Méthode** : `GET`
-  - **URL** : `/orders/customer/{customerId}`
-  - **Description** : Récupère les commandes passées par un client.
+- **Get orders by customer**
+  - **Method**: `GET`
+  - **URL**: `/orders/customer/{customerId}`
+  - **Description**: Retrieves the orders placed by a customer.
 
-##### Exemple de Code Frontend
+- **Get orders by restaurant**
+  - **Method**: `GET`
+  - **URL**: `/orders/restaurant/{restaurantId}`
+  - **Description**: Retrieves the orders associated with a restaurant.
+
+- **Place an order**
+  - **Method**: `POST`
+  - **URL**: `/orders/place`
+  - **Description**: Places an order from the user's cart.
+
+- **Pay for an order**
+  - **Method**: `POST`
+  - **URL**: `/orders/pay`
+  - **Description**: Processes the payment for an order.
+
+##### Frontend Code Example
 
 ```javascript
 async function createOrder(order) {
@@ -290,41 +317,127 @@ async function getOrdersByCustomer(customerId) {
     });
     return response.json();
 }
+
+async function placeOrder() {
+    const authToken = localStorage.getItem('authToken');
+    const userId = localStorage.getItem('userId');
+
+    if (!authToken || !userId) {
+        alert("You must be logged in to place an order.");
+        window.location.href = 'login.html'; // Redirect to login
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/orders/place`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ userId: parseInt(userId) })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error placing order.");
+        }
+
+        const newOrder = await response.json();
+        alert(`Order placed successfully! Order number: ${newOrder.id}`);
+        clearCart();  // Clear the cart after successful order.
+        // Redirect to the orders page to show the new order.
+        window.location.href = 'orders.html';
+
+    } catch (error) {
+        console.error('Error placing order:', error);
+        alert('Failed to place order. ' + error.message);
+    }
+}
+
+async function payOrder(orderId, paymentDetails) {
+    const authToken = localStorage.getItem('authToken');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/orders/pay`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ orderId, paymentDetails })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error processing payment.");
+        }
+
+        alert('Payment successful!');
+        // Redirect to the orders page or show a success message
+    } catch (error) {
+        console.error('Error processing payment:', error);
+        alert('Failed to process payment. ' + error.message);
+    }
+}
 ```
 
 #### 6. **DeliveryController**
 
 ##### Endpoints
 
-- **Créer une livraison**
-  - **Méthode** : `POST`
-  - **URL** : `/deliveries`
-  - **Description** : Crée une nouvelle livraison.
-  - **Exemple de requête** :
+- **Assign a delivery**
+  - **Method**: `POST`
+  - **URL**: `/deliveries/assign`
+  - **Description**: Assigns a delivery person to an order.
+  - **Request Example**:
     ```json
     {
       "orderId": 1,
-      "deliveryPersonId": 2,
-      "status": "PENDING"
+      "deliveryPersonId": 2
     }
     ```
 
-- **Obtenir une livraison par ID**
-  - **Méthode** : `GET`
-  - **URL** : `/deliveries/{id}`
-  - **Description** : Récupère une livraison par son ID.
+- **Update delivery status**
+  - **Method**: `POST`
+  - **URL**: `/deliveries/update-status`
+  - **Description**: Updates the status of a delivery.
+  - **Request Example**:
+    ```json
+    {
+      "deliveryId": 1,
+      "status": "IN_PROGRESS"
+    }
+    ```
 
-##### Exemple de Code Frontend
+- **Get delivery by ID**
+  - **Method**: `GET`
+  - **URL**: `/deliveries/{id}`
+  - **Description**: Retrieves a delivery by its ID.
+
+##### Frontend Code Example
 
 ```javascript
-async function createDelivery(delivery) {
-    const response = await fetch(`${API_BASE_URL}/deliveries`, {
+async function assignDelivery(orderId, deliveryPersonId) {
+    const response = await fetch(`${API_BASE_URL}/deliveries/assign`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authToken}`
         },
-        body: JSON.stringify(delivery)
+        body: JSON.stringify({ orderId, deliveryPersonId })
+    });
+    return response.json();
+}
+
+async function updateDeliveryStatus(deliveryId, status) {
+    const response = await fetch(`${API_BASE_URL}/deliveries/update-status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ deliveryId, status })
     });
     return response.json();
 }
@@ -337,9 +450,81 @@ async function getDeliveryById(deliveryId) {
 }
 ```
 
+#### 7. **ReviewController**
+
+##### Endpoints
+
+- **Create a review**
+  - **Method**: `POST`
+  - **URL**: `/reviews`
+  - **Description**: Creates a new review.
+  - **Request Example**:
+    ```json
+    {
+      "customerId": 1,
+      "restaurantId": 1,
+      "deliveryId": 1,
+      "foodItemId": 1,
+      "rating": 5,
+      "comment": "Great food!"
+    }
+    ```
+
+- **Get reviews by restaurant**
+  - **Method**: `GET`
+  - **URL**: `/reviews/restaurant/{restaurantId}`
+  - **Description**: Retrieves reviews for a restaurant.
+
+- **Get reviews by delivery**
+  - **Method**: `GET`
+  - **URL**: `/reviews/delivery/{deliveryId}`
+  - **Description**: Retrieves reviews for a delivery.
+
+- **Get reviews by food item**
+  - **Method**: `GET`
+  - **URL**: `/reviews/food-item/{foodItemId}`
+  - **Description**: Retrieves reviews for a food item.
+
+##### Frontend Code Example
+
+```javascript
+async function createReview(review) {
+    const response = await fetch(`${API_BASE_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify(review)
+    });
+    return response.json();
+}
+
+async function getReviewsByRestaurant(restaurantId) {
+    const response = await fetch(`${API_BASE_URL}/reviews/restaurant/${restaurantId}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    return response.json();
+}
+
+async function getReviewsByDelivery(deliveryId) {
+    const response = await fetch(`${API_BASE_URL}/reviews/delivery/${deliveryId}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    return response.json();
+}
+
+async function getReviewsByFoodItem(foodItemId) {
+    const response = await fetch(`${API_BASE_URL}/reviews/food-item/${foodItemId}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    return response.json();
+}
+```
+
 ### Conclusion
 
-Ce guide fournit un aperçu des principaux endpoints disponibles dans votre application backend et des exemples de code pour les appeler depuis le frontend. Assurez-vous d'adapter les URLs et les données en fonction de vos besoins spécifiques.
+This guide provides an overview of the main endpoints available in your backend application and examples of code to call them from the frontend. Make sure to adapt the URLs and data according to your specific needs.
 
 API documentation is available at `http://localhost:8080/swagger-ui.html` once the application is running.
 

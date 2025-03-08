@@ -10,8 +10,9 @@ public class ReviewRequestDTO {
     @NotNull(message = "Customer ID cannot be null")
     private Long customerId;
 
-    private Long restaurantId;  // Can be null if reviewing a delivery
-    private Long deliveryId; // Can be null if reviewing a restaurant
+    private Long restaurantId;  // Can be null if reviewing a delivery or food item
+    private Long deliveryId; // Can be null if reviewing a restaurant or food item
+    private Long foodItemId; // Can be null if reviewing a restaurant or delivery
 
     @NotNull(message = "Rating cannot be null")
     @Min(value = 1, message = "Rating must be between 1 and 5")

@@ -2,14 +2,8 @@ package com.delivery.deliveryApp.controller;
 
 import com.delivery.deliveryApp.dto.ReviewRequestDTO;
 import com.delivery.deliveryApp.dto.ReviewResponseDTO;
-import com.delivery.deliveryApp.model.Delivery;
-import com.delivery.deliveryApp.model.Restaurant;
-import com.delivery.deliveryApp.model.Review;
-import com.delivery.deliveryApp.model.User;
-import com.delivery.deliveryApp.repository.DeliveryRepository;
-import com.delivery.deliveryApp.repository.RestaurantRepository;
-import com.delivery.deliveryApp.repository.ReviewRepository;
-import com.delivery.deliveryApp.repository.UserRepository;
+import com.delivery.deliveryApp.model.*;
+import com.delivery.deliveryApp.repository.*;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +31,9 @@ public class ReviewController {
 
     @Autowired
     private DeliveryRepository deliveryRepository;
+
+    @Autowired
+    private FoodItemRepository foodItemRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -74,6 +71,15 @@ public class ReviewController {
             review.setDelivery(delivery);
         }
 
+        if (reviewRequestDTO.getFoodItemId() != null) {
+            Optional<FoodItem> optionalFoodItem = foodItemRepository.findById(reviewRequestDTO.getFoodItemId());
+            if (optionalFoodItem.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Food item not found");
+            }
+            FoodItem foodItem = optionalFoodItem.get();
+            review.setFoodItem(foodItem);
+        }
+
         Review savedReview = reviewRepository.save(review);
         ReviewResponseDTO reviewResponseDTO = modelMapper.map(savedReview, ReviewResponseDTO.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewResponseDTO);
@@ -81,12 +87,6 @@ public class ReviewController {
 
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<?> getReviewsByRestaurant(@PathVariable Long restaurantId) {
-        Optional<Restaurant> optionalRestaurant = restaurantRepository.findById(restaurantId);
-        if (optionalRestaurant.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
-        }
-        Restaurant restaurant = optionalRestaurant.get();
-
         List<Review> reviews = reviewRepository.findByRestaurantId(restaurantId);
         List<ReviewResponseDTO> reviewResponseDTOs = reviews.stream()
                 .map(review -> modelMapper.map(review, ReviewResponseDTO.class))
@@ -96,13 +96,16 @@ public class ReviewController {
 
     @GetMapping("/delivery/{deliveryId}")
     public ResponseEntity<?> getReviewsByDelivery(@PathVariable Long deliveryId) {
-        Optional<Delivery> optionalDelivery = deliveryRepository.findById(deliveryId);
-        if (optionalDelivery.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Delivery not found");
-        }
-        Delivery delivery = optionalDelivery.get();
-
         List<Review> reviews = reviewRepository.findByDeliveryId(deliveryId);
+        List<ReviewResponseDTO> reviewResponseDTOs = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewResponseDTO.class))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(reviewResponseDTOs);
+    }
+
+    @GetMapping("/food-item/{foodItemId}")
+    public ResponseEntity<?> getReviewsByFoodItem(@PathVariable Long foodItemId) {
+        List<Review> reviews = reviewRepository.findByFoodItemId(foodItemId);
         List<ReviewResponseDTO> reviewResponseDTOs = reviews.stream()
                 .map(review -> modelMapper.map(review, ReviewResponseDTO.class))
                 .collect(Collectors.toList());

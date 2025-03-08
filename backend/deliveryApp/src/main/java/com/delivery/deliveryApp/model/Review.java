@@ -23,6 +23,10 @@ public class Review {
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
+    @ManyToOne
+    @JoinColumn(name = "food_item_id")
+    private FoodItem foodItem;
+
     @Column(nullable = false)
     private int rating;
 

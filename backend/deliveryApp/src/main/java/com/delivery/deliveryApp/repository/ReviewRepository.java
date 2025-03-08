@@ -7,4 +7,5 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByRestaurantId(Long restaurantId);
     List<Review> findByDeliveryId(Long deliveryId);
+    List<Review> findByFoodItemId(Long foodItemId);
 }
