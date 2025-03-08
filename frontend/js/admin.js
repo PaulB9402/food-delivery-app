@@ -5,7 +5,7 @@ const authToken = localStorage.getItem("authToken");
 
 async function loadUsers() {
     if (!authToken) {
-        window.location.href = './auth/login.html';  // Redirect to login if no auth token
+        window.location.href = '../auth/login.html';  // Redirect to login if no auth token
         return;
     }
 
