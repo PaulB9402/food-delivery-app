@@ -71,14 +71,6 @@ async function fetchRestaurants() {
 /** ============================
  * 🍽️ Afficher le MENU d'un restaurant
  * ============================ */
-const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
-
-function showMenuModal() {
-    const modalElement = document.getElementById("menuModal");
-    modalElement.setAttribute("aria-hidden", "false");
-    menuModal.show();
-}
-
 async function viewRestaurant(id) {
     const authToken = localStorage.getItem('authToken');
 
@@ -87,7 +79,9 @@ async function viewRestaurant(id) {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
-        if (!response.ok) throw new Error("Erreur lors de la récupération du menu");
+        if (!response.ok) {
+            throw new Error("Erreur lors de la récupération du menu");
+        }
 
         const foodItems = await response.json();
 
@@ -108,13 +102,12 @@ async function viewRestaurant(id) {
 
         currentRestaurantId = id;
 
-        showMenuModal();  // ✅ Ouvrir la modale avec la correction ARIA
+        new bootstrap.Modal(document.getElementById("menuModal")).show();
     } catch (error) {
         console.error("Erreur lors de la récupération du menu :", error);
         alert("Erreur lors de la récupération du menu.");
     }
 }
-
 
 
 /** ============================
