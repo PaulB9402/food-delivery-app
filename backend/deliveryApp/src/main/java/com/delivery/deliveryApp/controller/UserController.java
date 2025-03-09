@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +50,38 @@ public class UserController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+// Récupérer un utilisateur par ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        logger.info("Demande de récupération pour l'utilisateur avec ID: {}", id);
+        
+        Optional<User> userOptional = userRepository.findById(id);
+        if (!userOptional.isPresent()) {
+            logger.warn("Utilisateur avec ID {} non trouvé", id);
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = userOptional.get();
+        // Pour des raisons de sécurité, on ne renvoie pas le mot de passe
+        user.setPassword(null);
+        
+        logger.info("Utilisateur avec ID {} récupéré avec succès", id);
+        return ResponseEntity.ok(user);
+    }
+
+    // Récupérer tous les utilisateurs
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        logger.info("Demande de récupération de tous les utilisateurs");
+        
+        List<User> users = userRepository.findAll();
+        // Pour des raisons de sécurité, on ne renvoie pas les mots de passe
+        users.forEach(user -> user.setPassword(null));
+        
+        logger.info("{} utilisateurs récupérés avec succès", users.size());
+        return ResponseEntity.ok(users);
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {

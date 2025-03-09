@@ -38,6 +38,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/carts", "/carts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/carts/**").permitAll() // Ensure GET requests to /carts/** are authenticated
                         .requestMatchers(HttpMethod.POST, "/orders/place").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/restaurants").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/restaurants/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -56,11 +60,12 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // Allow cookies to be sent
-        config.addAllowedOrigin("http://127.0.0.1:3000"); // Match this with your frontend URL
+        config.addAllowedOrigin("http://localhost:3000"); // Ajoutez cette ligne
+        config.addAllowedOrigin("http://127.0.0.1:3000"); 
+        config.addAllowedOrigin("http://localhost:5500"); // Si vous utilisez Live Server
+        config.addAllowedOrigin("http://127.0.0.1:5500");
         config.addAllowedHeader("*");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("OPTIONS"); // Allow preflight requests
+        config.addAllowedMethod("*"); // Autoriser toutes les méthodes HTTP
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
