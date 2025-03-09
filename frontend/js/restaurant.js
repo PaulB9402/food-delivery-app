@@ -148,14 +148,15 @@ window.placeOrder = async function() {
     }
 
     const orderData = {
-        customerId: parseInt(userId),
-        restaurantId: currentRestaurantId,
+        customer: { id: parseInt(userId) }, // 🔥 Correct
+        restaurant: { id: currentRestaurantId }, // 🔥 Correct
         orderItems: cart.map(item => ({
-            foodItemId: item.dishId,
+            foodItem: { id: item.dishId }, // 🔥 Correct
             quantity: item.quantity,
             customization: item.customization || ""
         }))
     };
+
 
     console.log("🟢 Order Data Sent:", JSON.stringify(orderData)); // ✅ Voir les données envoyées
 

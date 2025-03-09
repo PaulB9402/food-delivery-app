@@ -4,8 +4,13 @@ import com.delivery.deliveryApp.model.Order;
 import com.delivery.deliveryApp.config.CustomCartService;
 import com.delivery.deliveryApp.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.delivery.deliveryApp.model.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 
 import java.util.List;
 
@@ -20,9 +25,14 @@ public class OrderController {
     private CustomCartService cartService;
 
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderRepository.save(order);
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<Order> createOrder(@AuthenticationPrincipal User user, @RequestBody Order order) {
+    if (user == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    order.setCustomer(user); // Associer l'utilisateur connecté à la commande
+    return ResponseEntity.ok(orderRepository.save(order));
+}
 
     @GetMapping("/{id}")
     public Order getOrder(@PathVariable Long id) {
