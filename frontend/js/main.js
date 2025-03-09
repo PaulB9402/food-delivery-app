@@ -3,10 +3,11 @@ const API_BASE_URL = "http://localhost:8080";
 function loadRestaurants() {
     const authToken = localStorage.getItem("authToken");
 
+
     // 1️⃣ Vérifier l'authentification
     if (!authToken) {
         console.warn("Utilisateur non authentifié !");
-        window.location.href = './auth/login.html';
+        window.location.href = '../auth/login.html';
         return;
     }
 
@@ -86,7 +87,7 @@ function logout() {
         const [name] = cookie.trim().split("=");
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     });
-    window.location.href = './auth/login.html';
+    window.location.href = '../auth/login.html';
 }
 
 // 🔄 Charger les restaurants au démarrage

@@ -29,10 +29,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/register", "/users/login").permitAll()
                         .requestMatchers("/food-delivery-app/frontend/**").permitAll() // Allow access to static resources
-                        .requestMatchers("/orders/**").permitAll()
-                        .requestMatchers("/restaurants/**").permitAll()
-                        .requestMatchers("/menu/**").permitAll()
-                        .requestMatchers("/admin/**").permitAll()
+                        .requestMatchers("/orders", "/orders/**").permitAll()
+                        .requestMatchers("/restaurants","/restaurants/**").permitAll()
+                        .requestMatchers("/menu", "/menu/**").permitAll()
+                        .requestMatchers("/admin", "/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
