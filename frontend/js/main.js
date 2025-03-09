@@ -2,63 +2,55 @@ const API_BASE_URL = "http://localhost:8080";
 
 function loadRestaurants() {
     const authToken = localStorage.getItem("authToken");
-    const userRole = localStorage.getItem("userRole");
 
-    // 1. Vérifier l'authentification ET les permissions
-    if (!authToken || !userRole) {
+    // 1️⃣ Vérifier l'authentification
+    if (!authToken) {
+        console.warn("Utilisateur non authentifié !");
         window.location.href = './auth/login.html';
         return;
     }
 
-    // 2. Vérifier le rôle avant même de faire la requête
-    if (userRole !== "ADMIN" && userRole !== "RESTAURANT" && userRole !== "DELIVERY" && userRole !== "CLIENT") {
-        alert("Vous n'avez pas les permissions nécessaires");
-        window.location.href = './home.html';
-        return;
-    }
+    console.log("Chargement des restaurants ID par ID...");
 
-    console.log("Chargement des restaurants...");
+    let restaurantId = 1; // On commence à l'ID 1
+    let foundRestaurants = false; // Pour vérifier si on a trouvé au moins un restaurant
 
-    fetch(`${API_BASE_URL}/restaurants`, {
-        headers: {
-            "Authorization": `Bearer ${authToken}`,
-            "Content-Type": "application/json"
-        }
-    })
-    .then(response => {
-        // 3. Gestion centralisée des erreurs
-        if (response.status === 401 || response.status === 403) {
-            logout();
-            throw new Error("Session expirée ou accès refusé");
-        }
+    function fetchNextRestaurant() {
+        fetch(`${API_BASE_URL}/restaurants/${restaurantId}`, {
+            headers: {
+                "Authorization": `Bearer ${authToken}`,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => {
+            if (response.status === 404) {
+                console.log(`Restaurant ID ${restaurantId} non trouvé. Fin du chargement.`);
+                if (!foundRestaurants) {
+                    document.getElementById("restaurant-list").innerHTML = "<p class='text-muted'>Aucun restaurant trouvé.</p>";
+                }
+                return; // Arrêter la boucle
+            }
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(restaurant => {
+            if (!restaurant) return; // Arrêter si aucune donnée
 
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
-        }
+            foundRestaurants = true; // On a trouvé au moins un restaurant
+            const restaurantList = document.getElementById("restaurant-list");
 
-        return response.json();
-    })
-    .then(restaurants => {
-        const restaurantList = document.getElementById("restaurant-list");
-        restaurantList.innerHTML = "";
-
-        // 4. Ajout d'une vérification de sécurité
-        if (!Array.isArray(restaurants)) {
-            throw new Error("Format de réponse inattendu");
-        }
-
-        restaurants.forEach(restaurant => {
             const card = `
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
-                        <img src="${restaurant.image}" class="card-img-top" alt="${restaurant.name}">
+                        <img src="${restaurant.image || 'default.jpg'}" class="card-img-top" alt="${restaurant.name}">
                         <div class="card-body">
                             <h5 class="card-title">${restaurant.name}</h5>
-                            <p class="card-text">${restaurant.cuisine}</p>
-                            <p class="text-muted">Livraison: ${restaurant.deliveryTime}</p>
+                            <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
+                            <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
                             <button class="btn btn-danger"
-                                    onclick="viewRestaurant(${restaurant.id})"
-                                    data-testid="restaurant-${restaurant.id}">
+                                    onclick="viewRestaurant(${restaurant.id})">
                                 Voir le menu
                             </button>
                         </div>
@@ -66,36 +58,38 @@ function loadRestaurants() {
                 </div>
             `;
             restaurantList.innerHTML += card;
-        });
-    })
-    .catch(error => {
-        // 5. Gestion d'erreur améliorée
-        console.error("Erreur critique:", error);
 
-        if (error.message.includes("accès refusé")) {
-            console.error("Détails du refus:", {
-                token: localStorage.getItem('authToken'),
-                role: localStorage.getItem('userRole')
-            });
-            alert("Accès refusé. Vérifiez vos permissions.");
-            logout();
-        } else {
+            // Charger le restaurant suivant
+            restaurantId++;
+            fetchNextRestaurant();
+        })
+        .catch(error => {
+            console.error("Erreur lors du chargement des restaurants:", error);
             alert(`Erreur technique: ${error.message}`);
-        }
-    });
+        });
+    }
+
+    // Démarrer la boucle
+    fetchNextRestaurant();
 }
 
+// Fonction pour afficher un restaurant spécifique
+function viewRestaurant(restaurantId) {
+    console.log(`Redirection vers le restaurant ${restaurantId}`);
+    window.location.href = `restaurant-menu.html?id=${restaurantId}`;
+}
+
+// Fonction de déconnexion sécurisée
 function logout() {
-    // 6. Nettoyage complet
     localStorage.clear();
     document.cookie.split(";").forEach(cookie => {
         const [name] = cookie.trim().split("=");
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     });
-    window.location.href = './views/auth/login.html';
+    window.location.href = './auth/login.html';
 }
 
-// Initialisation sécurisée
+// 🔄 Charger les restaurants au démarrage
 document.addEventListener('DOMContentLoaded', () => {
     try {
         loadRestaurants();
