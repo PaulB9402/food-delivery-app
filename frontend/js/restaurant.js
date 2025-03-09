@@ -41,37 +41,32 @@ async function fetchRestaurants() {
             const restaurant = await response.json();
             foundRestaurants = true;
 
-            displayRestaurantCard(restaurant);
+            const card = `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="${restaurant.image || 'default.jpg'}" class="card-img-top" alt="${restaurant.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${restaurant.name}</h5>
+                            <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
+                            <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
+                            <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            restaurantList.innerHTML += card;
+
             id++;
-            fetchNext(); // Charger le suivant
+            fetchNext();
         } catch (error) {
-            console.error("Erreur chargement restaurants:", error);
+            console.error("Erreur lors du chargement des restaurants:", error);
+            alert(`Erreur technique: ${error.message}`);
         }
     }
 
     fetchNext();
 }
 
-/** ============================
- * 📌 Afficher UN restaurant sous forme de carte
- * ============================ */
-function displayRestaurantCard(restaurant) {
-    const card = `
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="${restaurant.image || 'default.jpg'}" class="card-img-top" alt="${restaurant.name}">
-                <div class="card-body">
-                    <h5 class="card-title">${restaurant.name}</h5>
-                    <p class="card-text">Cuisine : ${restaurant.cuisine || 'Inconnue'}</p>
-                    <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">
-                        Voir le menu
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    restaurantList.innerHTML += card;
-}
 
 /** ============================
  * 🍽️ Afficher le MENU d'un restaurant
