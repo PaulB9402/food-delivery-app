@@ -51,31 +51,40 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {
-    logger.info("Login attempt for user: {}", user.getUsername());
+        logger.info("Login attempt for user: {}", user.getUsername());
 
-    try {
-        logger.info("User entered password: {}", user.getPassword());
-        logger.info("Stored hashed password: {}", userDetailsService.loadUserByUsername(user.getUsername()).getPassword());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-        String token = jwtTokenProvider.generateToken(user.getUsername(), roles);
-        logger.info("Login successful for user: {}", user.getUsername());
-        return ResponseEntity.ok(Map.of("token", token));
-    } catch (Exception e) {
-        logger.error("Login failed for user: {}", user.getUsername(), e);
-        // Return a JSON response with an error message
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "Invalid credentials"));
+            // ✅ Récupération de l'utilisateur dans la base de données
+            Optional<User> optionalUser = userRepository.findByUsername(user.getUsername());
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Utilisateur introuvable"));
+            }
+
+            User loggedInUser = optionalUser.get();
+            String token = jwtTokenProvider.generateToken(user.getUsername(), roles);
+
+            // ✅ Ajout de `userId` dans la réponse
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "userId", loggedInUser.getId(),
+                    "role", roles.get(0) // Prend le premier rôle si plusieurs
+            ));
+        } catch (Exception e) {
+            logger.error("Login failed for user: {}", user.getUsername(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid credentials"));
+        }
     }
-}
 
 
     @PostMapping("/register")
