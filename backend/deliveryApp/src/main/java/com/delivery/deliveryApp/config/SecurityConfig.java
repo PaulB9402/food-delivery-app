@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/food-delivery-app/frontend/**").permitAll() // Allow access to static resources
                         .requestMatchers("/orders", "/orders/**").permitAll()
                         .requestMatchers("/restaurants","/restaurants/**").permitAll()
+                        .requestMatchers("/food-items","/food-items/**").permitAll()
                         .requestMatchers("/menu", "/menu/**").permitAll()
                         .requestMatchers("/admin", "/admin/**").permitAll()
                         .anyRequest().authenticated()
