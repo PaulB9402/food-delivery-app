@@ -71,46 +71,51 @@ async function fetchRestaurants() {
 /** ============================
  * 🍽️ Afficher le MENU d'un restaurant
  * ============================ */
+const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
+
+function showMenuModal() {
+    const modalElement = document.getElementById("menuModal");
+    modalElement.setAttribute("aria-hidden", "false");
+    menuModal.show();
+}
+
 async function viewRestaurant(id) {
+    const authToken = localStorage.getItem('authToken');
+
     try {
-        const response = await fetch(`${API_BASE_URL}/restaurants/${id}`, {
-            headers: { "Authorization": `Bearer ${authToken}` }
+        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${id}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
-        if (!response.ok) {
-            throw new Error("Erreur lors de la récupération du menu");
-        }
+        if (!response.ok) throw new Error("Erreur lors de la récupération du menu");
 
-        const restaurant = await response.json();
+        const foodItems = await response.json();
 
-        document.getElementById("modal-restaurant-name").textContent = restaurant.name;
-        document.getElementById("modal-restaurant-cuisine").textContent = restaurant.cuisine || "Non précisé";
+        document.getElementById("modal-restaurant-name").textContent = `Menu du Restaurant ${id}`;
 
         const menuList = document.getElementById("modal-menu-list");
         menuList.innerHTML = "";
 
-        if (!restaurant.foodItems || restaurant.foodItems.length === 0) {
-            menuList.innerHTML = "<p class='text-muted'>Aucun plat disponible.</p>";
-        } else {
-            restaurant.foodItems.forEach(dish => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-                listItem.innerHTML = `
-                    ${dish.name} - ${dish.price}€
-                    <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name}', ${dish.price}, ${restaurant.id})">Ajouter</button>
-                `;
-                menuList.appendChild(listItem);
-            });
-        }
+        foodItems.forEach(dish => {
+            const listItem = document.createElement("li");
+            listItem.classList.add("list-group-item");
+            listItem.innerHTML = `
+                ${dish.name} - ${dish.price}€
+                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name}', ${dish.price}, ${id})">Ajouter</button>
+            `;
+            menuList.appendChild(listItem);
+        });
 
-        currentRestaurantId = restaurant.id;
-        const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
-        menuModal.show();
+        currentRestaurantId = id;
+
+        showMenuModal();  // ✅ Ouvrir la modale avec la correction ARIA
     } catch (error) {
-        console.error("Erreur menu :", error);
-        alert("Impossible de charger le menu.");
+        console.error("Erreur lors de la récupération du menu :", error);
+        alert("Erreur lors de la récupération du menu.");
     }
 }
+
+
 
 /** ============================
  * 🛒 Ajouter un plat au panier
