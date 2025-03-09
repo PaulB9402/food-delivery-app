@@ -1,8 +1,8 @@
-
 package com.delivery.deliveryApp.model;
 
 import java.util.List;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Menu {
@@ -15,6 +15,7 @@ public class Menu {
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<FoodItem> foodItems;
 
     public List<FoodItem> getFoodItems() {
@@ -32,6 +33,4 @@ public class Menu {
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }
-
 }
-

@@ -4,6 +4,7 @@ import com.delivery.deliveryApp.model.Cart;
 import com.delivery.deliveryApp.config.CustomCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +17,21 @@ public class CartController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<Cart> getCartByUserId(@PathVariable Long userId) {
         Cart cart = cartService.getCartByUserId(userId);
+        // Initialiser la collection items avant de fermer la session
+        cart.getItems().size();
         return ResponseEntity.ok(cart);
     }
 
-    @PostMapping("/user/{userId}/add-item/{foodItemId}")
-    public ResponseEntity<Cart> addItemToCart(@PathVariable Long userId, @PathVariable Long foodItemId, @RequestParam int quantity) {
-        Cart cart = cartService.addItemToCart(userId, foodItemId, quantity);
-        return ResponseEntity.ok(cart);
+    @PostMapping("/user/{userId}/add-item/{itemId}")
+    @Transactional
+    public ResponseEntity<?> addItemToCart(@PathVariable Long userId, @PathVariable Long itemId, @RequestParam int quantity) {
+        try {
+            Cart cart = cartService.addItemToCart(userId, itemId, quantity);
+            // Initialiser la collection items avant de fermer la session
+            cart.getItems().size();
+            return ResponseEntity.ok(cart);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erreur lors de l'ajout de l'article au panier.");
+        }
     }
 }

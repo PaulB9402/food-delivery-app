@@ -1,17 +1,10 @@
 package com.delivery.deliveryApp.config;
 
-import com.delivery.deliveryApp.model.Cart;
-import com.delivery.deliveryApp.model.CartItem;
-import com.delivery.deliveryApp.model.Order;
-import com.delivery.deliveryApp.model.OrderItem;
-import com.delivery.deliveryApp.model.FoodItem;
-import com.delivery.deliveryApp.model.User;
-import com.delivery.deliveryApp.repository.CartRepository;
-import com.delivery.deliveryApp.repository.FoodItemRepository;
-import com.delivery.deliveryApp.repository.OrderRepository;
-import com.delivery.deliveryApp.repository.UserRepository;
+import com.delivery.deliveryApp.model.*;
+import com.delivery.deliveryApp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +35,7 @@ public class CustomCartService {
         });
     }
 
+    @Transactional
     public Cart addItemToCart(Long userId, Long foodItemId, int quantity) {
         Cart cart = getCartByUserId(userId);
         Optional<FoodItem> foodItemOptional = foodItemRepository.findById(foodItemId);
@@ -56,9 +50,12 @@ public class CustomCartService {
         cartItem.setCart(cart); // Set the cart for the cart item
         cart.getItems().add(cartItem);
 
+        // Initialiser la collection items avant de fermer la session
+        cart.getItems().size();
         return cartRepository.save(cart);
     }
 
+    @Transactional
     public Order placeOrder(Long userId) {
         Cart cart = getCartByUserId(userId);
         if (cart.getItems().isEmpty()) {

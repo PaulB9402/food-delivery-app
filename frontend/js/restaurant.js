@@ -74,6 +74,7 @@ async function fetchRestaurants() {
                         <div class="card-body">
                             <h5 class="card-title">${restaurant.name}</h5>
                             <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
+                            <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
                             <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
                         </div>
                     </div>
@@ -85,6 +86,7 @@ async function fetchRestaurants() {
             fetchNext();
         } catch (error) {
             console.error("Erreur lors du chargement des restaurants:", error);
+            alert(`Erreur technique: ${error.message}`);
         }
     }
 
@@ -94,45 +96,34 @@ async function fetchRestaurants() {
 /** ============================
  * 📋 Voir le menu d'un restaurant
  * ============================ */
-window.viewRestaurant = async function(restaurantId) {
-    if (!authToken) {
-        alert("🔑 Session invalide. Veuillez vous reconnecter.");
-        window.location.href = '../auth/login.html';
-        return;
-    }
-
+window.viewRestaurant = async function(id) {
     try {
-        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${restaurantId}`, {
-            headers: { "Authorization": `Bearer ${authToken}` }
+        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${id}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
-        if (!response.ok) {
-            throw new Error("Erreur lors de la récupération du menu.");
-        }
-
+        if (!response.ok) throw new Error("Erreur lors de la récupération du menu");
         const foodItems = await response.json();
 
-        // 🔄 Mise à jour du modal avec les plats du restaurant
+        document.getElementById("modal-restaurant-name").textContent = `Menu du Restaurant ${id}`;
         const menuList = document.getElementById("modal-menu-list");
         menuList.innerHTML = foodItems.map(dish => `
             <li class="list-group-item">
                 ${dish.name} - ${dish.price}€
-                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name.replace(/'/g, "\\'")}', ${dish.price}, ${restaurantId})">
+                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name.replace(/'/g, "\\'")}', ${dish.price}, ${id})">
                     Ajouter
                 </button>
             </li>
         `).join('');
 
-        document.getElementById("modal-restaurant-name").textContent = `Menu du Restaurant ${restaurantId}`;
-
+        currentRestaurantId = id;
         const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
         menuModal.show();
     } catch (error) {
-        console.error("❌ Erreur lors de la récupération du menu :", error);
-        alert("Impossible de charger le menu.");
+        console.error("Erreur lors de la récupération des plats:", error);
+        alert("Impossible de charger les plats.");
     }
-};
-
+}
 
 /** ============================
  * 🛒 Ajouter au panier via API
@@ -144,7 +135,8 @@ window.addToCart = async function(dishId, dishName, price, restaurantId) {
         const response = await fetch(`${API_BASE_URL}/carts/user/${userId}/add-item/${dishId}?quantity=1`, {
             method: 'POST',
             headers: {
-                "Authorization": `Bearer ${authToken}`
+                "Authorization": `Bearer ${authToken}`,
+                "Content-Type": "application/json" // Ajout de l'en-tête Content-Type
             }
         });
 
@@ -156,49 +148,6 @@ window.addToCart = async function(dishId, dishName, price, restaurantId) {
         }
     } catch (error) {
         console.error("❌ Erreur lors de l'ajout au panier :", error);
-    }
-};
-
-/** ============================
- * 🛒 Passer la commande via API
- * ============================ */
-window.placeOrder = async function() {
-    if (!authToken || !userId || !userRole) {
-        alert("🔑 Session invalide. Veuillez vous reconnecter.");
-        window.location.href = '../auth/login.html';
-        return;
-    }
-
-    // 🔒 Seuls les clients peuvent commander
-    if (userRole !== "CLIENT") {
-        alert("🚫 Seuls les clients peuvent passer une commande !");
-        return;
-    }
-
-    if (cart.length === 0) {
-        alert("🛒 Votre panier est vide !");
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/orders/place?userId=${userId}`, {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${authToken}`
-            }
-        });
-
-        if (response.ok) {
-            const newOrder = await response.json();
-            alert(`✅ Commande réussie ! Numéro de commande : ${newOrder.id}`);
-            clearCart();
-            window.location.href = 'orders.html';
-        } else {
-            throw new Error("Erreur lors du passage de la commande.");
-        }
-    } catch (error) {
-        console.error("❌ Erreur lors de la commande :", error);
-        alert(`Échec de la commande : ${error.message}`);
     }
 };
 

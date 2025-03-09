@@ -2,6 +2,7 @@ package com.delivery.deliveryApp.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Data
 @Entity
@@ -29,5 +30,6 @@ public class FoodItem {
     
     @ManyToOne
     @JoinColumn(name = "menu_id")
+    @JsonBackReference
     private Menu menu;
 }
