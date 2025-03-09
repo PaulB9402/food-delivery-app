@@ -140,19 +140,25 @@ window.placeOrder = async function() {
         return;
     }
 
+    const userId = localStorage.getItem("userId"); // ⚠️ Assure-toi que ça existe
+    if (!userId) {
+        alert("Erreur : userId introuvable !");
+        return;
+    }
+
+    const orderData = {
+        customerId: parseInt(userId),
+        restaurantId: currentRestaurantId,
+        orderItems: cart.map(item => ({
+            foodItemId: item.dishId,
+            quantity: item.quantity,
+            customization: item.customization || ""
+        }))
+    };
+
+    console.log("🟢 Order Data Sent:", JSON.stringify(orderData)); // ✅ Voir les données envoyées
+
     try {
-        const orderData = {
-            customerId: parseInt(userId),
-            restaurantId: currentRestaurantId,
-            orderItems: cart.map(item => ({
-                foodItemId: item.dishId,
-                quantity: item.quantity,
-                customization: item.customization || ""
-            }))
-        };
-
-        console.log("Order Data Sent:", orderData);
-
         const response = await fetch(`${API_BASE_URL}/orders`, {
             method: 'POST',
             headers: {
@@ -162,20 +168,30 @@ window.placeOrder = async function() {
             body: JSON.stringify(orderData)
         });
 
+        console.log("🔴 Réponse brute:", response);
+
+        if (response.status === 403) {
+            throw new Error("🚨 Accès interdit. Vérifiez votre rôle ou votre authentification.");
+        }
+        if (response.status === 401) {
+            throw new Error("🔑 Session expirée. Reconnectez-vous.");
+        }
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Erreur lors de la commande");
+            const errorText = await response.text();
+            throw new Error(`Erreur API: ${response.status} - ${errorText}`);
         }
 
-        alert("Commande passée avec succès !");
+        const newOrder = await response.json();
+        alert(`Commande réussie ! Numéro de commande : ${newOrder.id}`);
         clearCart();
         window.location.href = 'orders.html';
 
     } catch (error) {
-        console.error("Erreur commande :", error);
-        alert("Échec de la commande : " + error.message);
+        console.error("❌ Erreur lors de la commande :", error);
+        alert(`Échec de la commande : ${error.message}`);
     }
 };
+
 
 
 // Fonctions auxiliaires
