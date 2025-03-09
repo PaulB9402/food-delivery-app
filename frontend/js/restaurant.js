@@ -193,6 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (restaurantId) {
         viewRestaurant(restaurantId);
     } else {
-        fetchRestaurants();
+        loadRestaurants();
     }
 });
