@@ -1,5 +1,6 @@
 import { requireAuth } from './auth.js';
 document.addEventListener('DOMContentLoaded', requireAuth);
+
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 const userId = localStorage.getItem("userId");
@@ -46,6 +47,49 @@ async function loadRestaurant() {
         console.error("Erreur lors de la récupération du restaurant:", error);
         alert("Impossible de charger le restaurant.");
     }
+}
+
+/** ==========================
+ *  CHARGER LES PLATS
+ *  ========================== */
+async function loadDishes() {
+    const headers = getAuthHeaders();
+    if (!headers) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${restaurantId}`, { headers });
+
+        if (!response.ok) throw new Error("Erreur lors de la récupération des plats.");
+
+        const dishes = await response.json();
+        displayDishes(dishes); // Afficher les plats
+    } catch (error) {
+        console.error("Erreur lors de la récupération des plats:", error);
+        alert("Impossible de charger les plats.");
+    }
+}
+
+/** ==========================
+ *  AFFICHER LES PLATS
+ *  ========================== */
+function displayDishes(dishes) {
+    const dishList = document.getElementById("dish-list");
+    dishList.innerHTML = "";
+
+    dishes.forEach(dish => {
+        const dishCard = `
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${dish.name}</h5>
+                        <p class="card-text">${dish.description}</p>
+                        <p class="card-text">Prix: ${dish.price}€</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        dishList.innerHTML += dishCard;
+    });
 }
 
 /** ==========================
