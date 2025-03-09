@@ -76,8 +76,7 @@ public class UserController {
             // ✅ Ajout de `userId` dans la réponse
             return ResponseEntity.ok(Map.of(
                     "token", token,
-                    "userId", loggedInUser.getId(),
-                    "role", roles.get(0) // Prend le premier rôle si plusieurs
+                    "userId", loggedInUser.getId()
             ));
         } catch (Exception e) {
             logger.error("Login failed for user: {}", user.getUsername(), e);

@@ -46,6 +46,12 @@ async function handleLogin(event) {
         localStorage.setItem('userRole', role);
         localStorage.setItem('userId', data.userId);
 
+        console.log("Stockage après login:", {
+            token: localStorage.getItem("authToken"),
+            userId: localStorage.getItem("userId"),
+            role: localStorage.getItem("userRole"),
+        });
+
         switch (role) {
             case 'CLIENT':
                 window.location.href = '../home.html';
