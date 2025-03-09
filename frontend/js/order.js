@@ -1,6 +1,12 @@
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem("authToken");
 const userId = localStorage.getItem("userId");
+const userRole = localStorage.getItem("userRole");
+
+document.addEventListener('DOMContentLoaded', () => {
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    placeOrderBtn.addEventListener('click', placeOrder);
+});
 
 /** ==========================
  *  Vérification du JWT
@@ -134,36 +140,64 @@ function displayOrderDetails(order) {
     new bootstrap.Modal(document.getElementById("orderDetailsModal")).show();
 }
 
-async function placeOrder() {
-    console.log("placeOrder function called"); // Ajout du log
-    const priceElement = document.getElementById("cart-total");
-    const price = parseFloat(priceElement.textContent.replace('€', '')).toFixed(2);
+/** ==========================
+ *  PASSER UNE COMMANDE
+ *  ========================== */
+window.placeOrder = async function() {
+    console.log("placeOrder function called");
 
-    if (!authToken || !currentRestaurantId || cart.length === 0) {
-        alert("Votre panier est vide ou vous n'êtes pas connecté.");
+    if (!authToken || !userId || !userRole) {
+        alert("🔑 Session invalide. Veuillez vous reconnecter.");
+        window.location.href = '../auth/login.html';
+        return;
+    }
+
+    if (userRole !== "CLIENT") {
+        alert("🚫 Seuls les clients peuvent passer une commande !");
+        return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    const currentRestaurantId = localStorage.getItem('currentRestaurantId');
+
+    if (!cart || cart.length === 0) {
+        alert("🛒 Votre panier est vide !");
+        return;
+    }
+
+    if (!currentRestaurantId) {
+        alert("❌ Aucun restaurant sélectionné !");
         return;
     }
 
     try {
+        console.log("📦 Tentative de passage de commande...");
+        
+        const orderData = {
+            customerId: parseInt(userId),
+            restaurantId: parseInt(currentRestaurantId),
+            orderItems: cart.map(item => ({
+                foodItemId: item.foodItem.id,
+                quantity: item.quantity
+            }))
+        };
+
         const response = await fetch(`${API_BASE_URL}/orders/place`, {
             method: 'POST',
             headers: { "Authorization": `Bearer ${authToken}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                customerId: parseInt(localStorage.getItem('userId')),
-                restaurantId: currentRestaurantId,
-                totalPrice: price,
-                orderItems: cart.map(item => ({ foodItemId: item.dishId, quantity: item.quantity }))
-            })
+            body: JSON.stringify(orderData)
         });
 
         if (!response.ok) {
+            if (response.status === 403) {
+                console.error("Erreur 403: Accès refusé. Vérifiez vos permissions.");
+            }
             throw new Error("Erreur lors de la commande");
         }
 
         alert("Commande passée avec succès !");
-        cart = [];
-        currentRestaurantId = null;
-        viewCart();
+        localStorage.removeItem('cart'); // Vider le panier après la commande
+        localStorage.removeItem('currentRestaurantId'); // Supprimer l'ID du restaurant après la commande
         window.location.href = 'orders.html'; // Redirection vers la page des commandes
     } catch (error) {
         console.error("Erreur commande :", error);

@@ -31,7 +31,9 @@ async function fetchCart() {
         if (response.ok) {
             const data = await response.json();
             cart = data.items || [];
+            localStorage.setItem('cart', JSON.stringify(cart)); // Enregistrer le panier dans le stockage local
             console.log("🟢 Panier chargé :", cart);
+            document.dispatchEvent(new CustomEvent('cart-updated')); // Déclencher l'événement personnalisé
         } else {
             console.warn("⚠️ Impossible de charger le panier. Statut HTTP:", response.status);
         }
@@ -143,12 +145,14 @@ window.addToCart = async function(dishId, dishName, price, restaurantId) {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${authToken}`,
-                "Content-Type": "application/json" // Ajout de l'en-tête Content-Type
+                "Content-Type": "application/json"
             }
         });
 
         if (response.ok) {
             alert(`"${dishName}" ajouté au panier !`);
+            currentRestaurantId = restaurantId;
+            localStorage.setItem('currentRestaurantId', currentRestaurantId); // Enregistrer l'ID du restaurant dans le stockage local
             await fetchCart(); // 🔄 Mettre à jour le panier après ajout
         } else {
             alert("❌ Impossible d'ajouter au panier.");
@@ -164,6 +168,8 @@ window.addToCart = async function(dishId, dishName, price, restaurantId) {
 window.clearCart = async function() {
     cart = [];
     currentRestaurantId = null;
+    localStorage.removeItem('cart'); // Supprimer le panier du stockage local
+    localStorage.removeItem('currentRestaurantId'); // Supprimer l'ID du restaurant du stockage local
     viewCart();
 };
 

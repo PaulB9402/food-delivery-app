@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/orders").permitAll() 
                         .requestMatchers(HttpMethod.POST,"/carts", "/carts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/carts/**").permitAll() // Ensure GET requests to /carts/** are authenticated
+                        .requestMatchers(HttpMethod.POST, "/orders/place").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

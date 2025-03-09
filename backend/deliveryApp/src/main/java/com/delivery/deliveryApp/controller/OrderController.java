@@ -1,8 +1,9 @@
 package com.delivery.deliveryApp.controller;
 
+import com.delivery.deliveryApp.dto.OrderRequestDTO;
+import com.delivery.deliveryApp.dto.OrderResponseDTO;
 import com.delivery.deliveryApp.model.Order;
 import com.delivery.deliveryApp.config.CustomCartService;
-import com.delivery.deliveryApp.dto.OrderItemRequestDTO;
 import com.delivery.deliveryApp.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +37,14 @@ public class OrderController {
     }
 
     @PostMapping("/place")
-    public ResponseEntity<Order> placeOrder(
-            @RequestParam Long customerId,
-            @RequestParam Long restaurantId,
-            @RequestBody List<OrderItemRequestDTO> orderItems) {
-        Order order = cartService.placeOrder(customerId, restaurantId, orderItems);
-        return ResponseEntity.ok(order);
+    public ResponseEntity<OrderResponseDTO> placeOrder(@RequestBody OrderRequestDTO orderRequest) {
+        Order order = cartService.placeOrder(
+            orderRequest.getCustomerId(),
+            orderRequest.getRestaurantId(),
+            orderRequest.getOrderItems()
+        );
+        OrderResponseDTO orderResponse = new OrderResponseDTO(order);
+        return ResponseEntity.ok(orderResponse);
     }
 
     @PostMapping("/pay")

@@ -81,18 +81,6 @@
     <script type="module" src="../js/order.js"></script>
 
     <script>
-        // 🔄 Gestion du bouton "Passer la commande"
-        document.addEventListener('DOMContentLoaded', () => {
-            const placeOrderBtn = document.getElementById('place-order-btn');
-            placeOrderBtn.disabled = true; // Désactiver par défaut
-
-            document.addEventListener('cart-updated', () => { // Écouter l'événement personnalisé
-                placeOrderBtn.disabled = cart.length === 0; // Activer seulement si le panier n'est pas vide
-            });
-
-            placeOrderBtn.addEventListener('click', placeOrder); // Ajouter l'écouteur d'événement ici
-        });
-
         // 🔄 Gestion du logout
         function logout() {
             localStorage.clear();
