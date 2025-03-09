@@ -92,6 +92,49 @@ async function fetchRestaurants() {
 }
 
 /** ============================
+ * 📋 Voir le menu d'un restaurant
+ * ============================ */
+window.viewRestaurant = async function(restaurantId) {
+    if (!authToken) {
+        alert("🔑 Session invalide. Veuillez vous reconnecter.");
+        window.location.href = '../auth/login.html';
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${restaurantId}`, {
+            headers: { "Authorization": `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+            throw new Error("Erreur lors de la récupération du menu.");
+        }
+
+        const foodItems = await response.json();
+
+        // 🔄 Mise à jour du modal avec les plats du restaurant
+        const menuList = document.getElementById("modal-menu-list");
+        menuList.innerHTML = foodItems.map(dish => `
+            <li class="list-group-item">
+                ${dish.name} - ${dish.price}€
+                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name.replace(/'/g, "\\'")}', ${dish.price}, ${restaurantId})">
+                    Ajouter
+                </button>
+            </li>
+        `).join('');
+
+        document.getElementById("modal-restaurant-name").textContent = `Menu du Restaurant ${restaurantId}`;
+
+        const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
+        menuModal.show();
+    } catch (error) {
+        console.error("❌ Erreur lors de la récupération du menu :", error);
+        alert("Impossible de charger le menu.");
+    }
+};
+
+
+/** ============================
  * 🛒 Ajouter au panier via API
  * ============================ */
 window.addToCart = async function(dishId, dishName, price, restaurantId) {
