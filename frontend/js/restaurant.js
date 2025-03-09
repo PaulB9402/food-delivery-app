@@ -1,14 +1,37 @@
 const API_BASE_URL = "http://localhost:8080";
 const authToken = localStorage.getItem('authToken');
-const restaurantList = document.getElementById("restaurant-list");
-const urlParams = new URLSearchParams(window.location.search);
-const restaurantId = urlParams.get("id");
 const userId = localStorage.getItem('userId');
 const userRole = localStorage.getItem('userRole');
 
+const restaurantList = document.getElementById("restaurant-list");
+const urlParams = new URLSearchParams(window.location.search);
+const restaurantId = urlParams.get("id");
 
 let cart = [];
 let currentRestaurantId = null;
+
+/** ============================
+ * 🛒 Récupérer le panier depuis l'API
+ * ============================ */
+async function fetchCart() {
+    if (!authToken || !userId) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/carts/user/${userId}`, {
+            headers: { "Authorization": `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            cart = data.items || [];
+            console.log("🟢 Panier chargé :", cart);
+        } else {
+            console.warn("⚠️ Impossible de charger le panier.");
+        }
+    } catch (error) {
+        console.error("❌ Erreur lors du chargement du panier :", error);
+    }
+}
 
 /** ============================
  * 🏪 Charger TOUS les restaurants ID par ID
@@ -51,7 +74,6 @@ async function fetchRestaurants() {
                         <div class="card-body">
                             <h5 class="card-title">${restaurant.name}</h5>
                             <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
-                            <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
                             <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
                         </div>
                     </div>
@@ -63,82 +85,41 @@ async function fetchRestaurants() {
             fetchNext();
         } catch (error) {
             console.error("Erreur lors du chargement des restaurants:", error);
-            alert(`Erreur technique: ${error.message}`);
         }
     }
 
     fetchNext();
 }
 
-window.viewRestaurant = async function(id) {
+/** ============================
+ * 🛒 Ajouter au panier via API
+ * ============================ */
+window.addToCart = async function(dishId, dishName, price, restaurantId) {
+    if (!authToken || !userId) return;
+
     try {
-        const response = await fetch(`${API_BASE_URL}/food-items/search?restaurantId=${id}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
+        const response = await fetch(`${API_BASE_URL}/carts/user/${userId}/add-item/${dishId}?quantity=1`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${authToken}`
+            }
         });
 
-        if (!response.ok) throw new Error("Erreur lors de la récupération du menu");
-        const foodItems = await response.json();
-
-        document.getElementById("modal-restaurant-name").textContent = `Menu du Restaurant ${id}`;
-        const menuList = document.getElementById("modal-menu-list");
-        menuList.innerHTML = foodItems.map(dish => `
-            <li class="list-group-item">
-                ${dish.name} - ${dish.price}€
-                <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name.replace(/'/g, "\\'")}', ${dish.price}, ${id})">
-                    Ajouter
-                </button>
-            </li>
-        `).join('');
-
-        currentRestaurantId = id;
-        const menuModal = new bootstrap.Modal(document.getElementById("menuModal"));
-        menuModal.show();
+        if (response.ok) {
+            alert(`"${dishName}" ajouté au panier !`);
+            await fetchCart(); // 🔄 Mettre à jour le panier après ajout
+        } else {
+            alert("❌ Impossible d'ajouter au panier.");
+        }
     } catch (error) {
-        console.error("Erreur lors de la récupération des plats:", error);
-        alert("Impossible de charger les plats.");
+        console.error("❌ Erreur lors de l'ajout au panier :", error);
     }
-}
-
-
-window.addToCart = function(dishId, dishName, price, restaurantId) {
-    if (cart.length > 0 && currentRestaurantId !== restaurantId) {
-        alert("Commande unique par restaurant !");
-        return;
-    }
-
-    const existingItem = cart.find(item => item.dishId === dishId);
-    if (existingItem) existingItem.quantity++;
-    else cart.push({ dishId, dishName, price, quantity: 1, restaurantId });
-
-    currentRestaurantId = restaurantId;
-    alert(`"${dishName}" ajouté !`);
 };
 
-window.viewCart = function() {
-    const cartList = document.getElementById("cart-items");
-    cartList.innerHTML = cart.length === 0
-        ? "<p class='text-muted'>Panier vide</p>"
-        : cart.map((item, index) => `
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                ${item.dishName} (x${item.quantity}) - ${item.price}€
-                <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">Supprimer</button>
-            </li>
-        `).join('');
-
-    document.getElementById("cart-total").textContent =
-        `${cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}€`;
-
-    new bootstrap.Modal(document.getElementById("cartModal")).show();
-};
-
-window.clearCart = function() {
-    cart = [];
-    currentRestaurantId = null;
-    viewCart();
-};
-
+/** ============================
+ * 🛒 Passer la commande via API
+ * ============================ */
 window.placeOrder = async function() {
-    // 🔎 Vérification de l'authentification et du rôle
     if (!authToken || !userId || !userRole) {
         alert("🔑 Session invalide. Veuillez vous reconnecter.");
         window.location.href = '../auth/login.html';
@@ -151,147 +132,63 @@ window.placeOrder = async function() {
         return;
     }
 
-    // 🛒 Vérification du panier
-    if (!currentRestaurantId || cart.length === 0) {
+    if (cart.length === 0) {
         alert("🛒 Votre panier est vide !");
         return;
     }
 
-    const orderData = {
-        customer: { id: parseInt(userId) }, // ✅ Associer l'ID du client
-        restaurant: { id: currentRestaurantId }, // ✅ Associer l'ID du restaurant
-        orderItems: cart.map(item => ({
-            foodItem: { id: item.dishId }, // ✅ Associer l'ID du plat
-            quantity: item.quantity,
-            customization: item.customization || ""
-        }))
-    };
-
-    console.log("🟢 Order Data Sent:", JSON.stringify(orderData));
-
     try {
-        const response = await fetch(`${API_BASE_URL}/orders`, {
+        const response = await fetch(`${API_BASE_URL}/orders/place?userId=${userId}`, {
             method: 'POST',
             headers: {
-                "Authorization": `Bearer ${authToken}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(orderData)
+                "Authorization": `Bearer ${authToken}`
+            }
         });
 
-        console.log("🔴 Réponse brute:", response);
-
-        if (response.status === 403) {
-            throw new Error("🚨 Accès interdit. Vérifiez votre rôle ou votre authentification.");
+        if (response.ok) {
+            const newOrder = await response.json();
+            alert(`✅ Commande réussie ! Numéro de commande : ${newOrder.id}`);
+            clearCart();
+            window.location.href = 'orders.html';
+        } else {
+            throw new Error("Erreur lors du passage de la commande.");
         }
-        if (response.status === 401) {
-            logout(); // 🚪 Déconnexion automatique si le token est invalide
-            throw new Error("🔑 Session expirée. Reconnectez-vous.");
-        }
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erreur API: ${response.status} - ${errorText}`);
-        }
-
-        const newOrder = await response.json();
-        alert(`✅ Commande réussie ! Numéro de commande : ${newOrder.id}`);
-        clearCart();
-        window.location.href = 'orders.html';
-
     } catch (error) {
         console.error("❌ Erreur lors de la commande :", error);
         alert(`Échec de la commande : ${error.message}`);
     }
 };
 
-
-// Fonctions auxiliaires
-function removeFromCart(index) {
-    cart.splice(index, 1);
+/** ============================
+ * 🛒 Vider le panier via API
+ * ============================ */
+window.clearCart = async function() {
+    cart = [];
+    currentRestaurantId = null;
     viewCart();
-}
+};
 
+/** ============================
+ * 🔄 Afficher le panier
+ * ============================ */
+window.viewCart = function() {
+    const cartList = document.getElementById("cart-items");
+    cartList.innerHTML = cart.length === 0
+        ? "<p class='text-muted'>Panier vide</p>"
+        : cart.map(item => `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                ${item.foodItem.name} (x${item.quantity}) - ${item.foodItem.price}€
+            </li>
+        `).join('');
 
-function loadRestaurants() {
-    const authToken = localStorage.getItem("authToken");
+    const total = cart.reduce((sum, item) => sum + item.foodItem.price * item.quantity, 0);
+    document.getElementById("cart-total").textContent = `${total.toFixed(2)}€`;
+};
 
-
-    // 1️⃣ Vérifier l'authentification
-    if (!authToken) {
-        console.warn("Utilisateur non authentifié !");
-        window.location.href = '../auth/login.html';
-        return;
-    }
-
-    console.log("Chargement des restaurants ID par ID...");
-
-    let restaurantId = 1; // On commence à l'ID 1
-    let foundRestaurants = false; // Pour vérifier si on a trouvé au moins un restaurant
-
-    function fetchNextRestaurant() {
-        fetch(`${API_BASE_URL}/restaurants/${restaurantId}`, {
-            headers: {
-                "Authorization": `Bearer ${authToken}`,
-                "Content-Type": "application/json"
-            }
-        })
-        .then(response => {
-            if (response.status === 404) {
-                console.log(`Restaurant ID ${restaurantId} non trouvé. Fin du chargement.`);
-                if (!foundRestaurants) {
-                    document.getElementById("restaurant-list").innerHTML = "<p class='text-muted'>Aucun restaurant trouvé.</p>";
-                }
-                return; // Arrêter la boucle
-            }
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(restaurant => {
-            if (!restaurant) return; // Arrêter si aucune donnée
-
-            foundRestaurants = true; // On a trouvé au moins un restaurant
-            const restaurantList = document.getElementById("restaurant-list");
-
-            const card = `
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <img src="${restaurant.image || 'default.jpg'}" class="card-img-top" alt="${restaurant.name}">
-                        <div class="card-body">
-                            <h5 class="card-title">${restaurant.name}</h5>
-                            <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
-                            <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
-                            <button class="btn btn-danger"
-                                    onclick="viewRestaurant(${restaurant.id})">
-                                Voir le menu
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            restaurantList.innerHTML += card;
-
-            // Charger le restaurant suivant
-            restaurantId++;
-            fetchNextRestaurant();
-        })
-        .catch(error => {
-            console.error("Erreur lors du chargement des restaurants:", error);
-            alert(`Erreur technique: ${error.message}`);
-        });
-    }
-
-    // Démarrer la boucle
-    fetchNextRestaurant();
-}
-
-
-// ⏳ Charger les restaurants au démarrage
-document.addEventListener("DOMContentLoaded", () => {
-    if (restaurantId) {
-        viewRestaurant(restaurantId);
-    } else {
-        loadRestaurants();
-    }
+/** ============================
+ * ⏳ Charger le panier et les restaurants au démarrage
+ * ============================ */
+document.addEventListener("DOMContentLoaded", async () => {
+    await fetchCart(); // 🔄 Charger le panier depuis l'API
+    fetchRestaurants(); // 🔄 Charger les restaurants
 });

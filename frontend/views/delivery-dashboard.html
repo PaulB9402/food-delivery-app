@@ -1,42 +1,70 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord - Livreur</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/main.css" rel="stylesheet"> <!-- 🔄 Lien pour le CSS personnalisé -->
 </head>
+
 <body class="bg-light">
 
     <script type="module">
         import { requireAuth } from '../js/auth.js';
-        document.addEventListener('DOMContentLoaded', requireAuth);
+        document.addEventListener('DOMContentLoaded', () => {
+            requireAuth();
+
+            // 🔄 Vérifier le rôle de l'utilisateur
+            const userRole = localStorage.getItem("userRole");
+            if (userRole !== "DELIVERY") {
+                alert("🚫 Accès interdit : Seuls les livreurs peuvent accéder à cette page.");
+                window.location.href = '../auth/login.html';
+            }
+        });
     </script>
+
     <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.html">FoodDelivery</a>
+            <a class="navbar-brand" href="delivery-dashboard.html">FoodDelivery</a>
             <div class="navbar-nav">
-                <a class="nav-link" href="restaurant-dashboard.html">Commandes</a>
-                <a class="nav-link" href="restaurant-messages.html">Messages</a>
-                <a class="nav-link active" href="restaurant-profile.html">Profil</a>
-                <a class="nav-link" href="#" id="logout">Déconnexion</a>
+                <a class="nav-link active" href="delivery-dashboard.html">Commandes</a> <!-- 🔄 Adaptation des liens -->
+                <a class="nav-link" href="delivery-profile.html">Profil</a> <!-- 🔄 Adaptation des liens -->
+                <a class="nav-link" href="#" id="logout" onclick="logout()">Déconnexion</a>
             </div>
         </div>
     </nav>
+
     <div class="container mt-5">
         <h2 class="text-center">Tableau de bord - Livreur</h2>
 
-        <h4 class="mt-4">Commandes à livrer</h4>
-        <div class="row" id="pending-orders"></div>
+        <h4 class="mt-4">📦 Commandes à livrer</h4>
+        <div class="row" id="pending-orders">
+            <p class="text-muted">Chargement des commandes...</p> <!-- 🔄 Indicateur de chargement -->
+        </div>
 
-        <h4 class="mt-5">Commandes en cours de livraison</h4>
-        <div class="row" id="active-orders"></div>
+        <h4 class="mt-5">🚚 Commandes en cours de livraison</h4>
+        <div class="row" id="active-orders">
+            <p class="text-muted">Chargement des commandes en cours...</p> <!-- 🔄 Indicateur de chargement -->
+        </div>
 
-        <h4 class="mt-5">Historique des livraisons</h4>
-        <div class="row" id="delivered-orders"></div>
+        <h4 class="mt-5">📋 Historique des livraisons</h4>
+        <div class="row" id="delivered-orders">
+            <p class="text-muted">Chargement de l'historique...</p> <!-- 🔄 Indicateur de chargement -->
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/delivery.js"></script>
+
+    <!-- 🔄 Script pour le bouton de déconnexion -->
+    <script>
+        function logout() {
+            localStorage.clear(); // Effacer le stockage local
+            window.location.href = '../auth/login.html'; // Redirection vers la page de connexion
+        }
+    </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/main.css" rel="stylesheet">
 </head>
+
 <body>
     <script type="module">
         import { requireAuth } from '../js/auth.js';
         document.addEventListener('DOMContentLoaded', requireAuth);
     </script>
+
     <nav class="navbar navbar-expand-lg bg-danger navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="home.html">FoodDelivery</a>
@@ -19,16 +22,18 @@
                 <a class="nav-link" href="orders.html">Commandes</a>
                 <a class="nav-link" href="restaurant-messages.html">Messages</a>
                 <a class="nav-link active" href="restaurant-profile.html">Profil</a>
-                <a class="nav-link" href="#" id="logout">Déconnexion</a>
+                <a class="nav-link" href="#" id="logout" onclick="logout()">Déconnexion</a> <!-- 🔄 Correction du logout -->
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
         <h3 id="search-term" class="mb-3">Tous les restaurants</h3>
+        <div id="alert-message" class="alert d-none" role="alert"></div> <!-- 🔄 Espace pour les messages -->
         <div class="row" id="restaurant-list"></div>
     </div>
 
+    <!-- 🛒 Modal pour le menu -->
     <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -50,6 +55,7 @@
         </div>
     </div>
 
+    <!-- 🛒 Modal pour le panier -->
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -64,7 +70,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continuer les achats</button>
                     <button type="button" class="btn btn-danger" onclick="clearCart()">Vider le panier</button>
-                    <button type="button" class="btn btn-primary" onclick="placeOrder()">Passer la commande</button>
+                    <button type="button" class="btn btn-primary" id="place-order-btn" onclick="placeOrder()">Passer la commande</button> <!-- 🔄 ID ajouté -->
                 </div>
             </div>
         </div>
@@ -72,5 +78,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../js/restaurant.js"></script>
+
+    <script>
+        // 🔄 Gestion du bouton "Passer la commande"
+        document.addEventListener('DOMContentLoaded', () => {
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            placeOrderBtn.disabled = true; // Désactiver par défaut
+
+            document.addEventListener('cart-updated', () => { // Écouter l'événement personnalisé
+                placeOrderBtn.disabled = cart.length === 0; // Activer seulement si le panier n'est pas vide
+            });
+        });
+
+        // 🔄 Gestion du logout
+        function logout() {
+            localStorage.clear();
+            window.location.href = '../auth/login.html';
+        }
+    </script>
 </body>
+
 </html>
