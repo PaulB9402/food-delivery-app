@@ -117,11 +117,6 @@ function removeFromCart(index) {
     viewCart();
 }
 
-// Chargement initial
-document.addEventListener("DOMContentLoaded", fetchRestaurants);
-
-async function fetchRestaurants() {
-}
 
 async function fetchRestaurants() {
     if (!authToken) {
