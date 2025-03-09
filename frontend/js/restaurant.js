@@ -4,6 +4,8 @@ const restaurantList = document.getElementById("restaurant-list");
 const urlParams = new URLSearchParams(window.location.search);
 const restaurantId = urlParams.get("id");
 const userId = localStorage.getItem('userId');
+const userRole = localStorage.getItem('userRole');
+
 
 let cart = [];
 let currentRestaurantId = null;
@@ -136,29 +138,36 @@ window.clearCart = function() {
 };
 
 window.placeOrder = async function() {
-    if (!authToken || !currentRestaurantId || cart.length === 0) {
-        alert("Erreur : Panier vide ou utilisateur non connecté !");
+    // 🔎 Vérification de l'authentification et du rôle
+    if (!authToken || !userId || !userRole) {
+        alert("🔑 Session invalide. Veuillez vous reconnecter.");
+        window.location.href = '../auth/login.html';
         return;
     }
 
-    const userId = localStorage.getItem("userId"); // ⚠️ Assure-toi que ça existe
-    if (!userId) {
-        alert("Erreur : userId introuvable !");
+    // 🔒 Seuls les clients peuvent commander
+    if (userRole !== "CUSTOMER") {
+        alert("🚫 Seuls les clients peuvent passer une commande !");
+        return;
+    }
+
+    // 🛒 Vérification du panier
+    if (!currentRestaurantId || cart.length === 0) {
+        alert("🛒 Votre panier est vide !");
         return;
     }
 
     const orderData = {
-        customer: { id: parseInt(userId) }, // 🔥 Correct
-        restaurant: { id: currentRestaurantId }, // 🔥 Correct
+        customer: { id: parseInt(userId) }, // ✅ Associer l'ID du client
+        restaurant: { id: currentRestaurantId }, // ✅ Associer l'ID du restaurant
         orderItems: cart.map(item => ({
-            foodItem: { id: item.dishId }, // 🔥 Correct
+            foodItem: { id: item.dishId }, // ✅ Associer l'ID du plat
             quantity: item.quantity,
             customization: item.customization || ""
         }))
     };
 
-
-    console.log("🟢 Order Data Sent:", JSON.stringify(orderData)); // ✅ Voir les données envoyées
+    console.log("🟢 Order Data Sent:", JSON.stringify(orderData));
 
     try {
         const response = await fetch(`${API_BASE_URL}/orders`, {
@@ -176,6 +185,7 @@ window.placeOrder = async function() {
             throw new Error("🚨 Accès interdit. Vérifiez votre rôle ou votre authentification.");
         }
         if (response.status === 401) {
+            logout(); // 🚪 Déconnexion automatique si le token est invalide
             throw new Error("🔑 Session expirée. Reconnectez-vous.");
         }
         if (!response.ok) {
@@ -184,7 +194,7 @@ window.placeOrder = async function() {
         }
 
         const newOrder = await response.json();
-        alert(`Commande réussie ! Numéro de commande : ${newOrder.id}`);
+        alert(`✅ Commande réussie ! Numéro de commande : ${newOrder.id}`);
         clearCart();
         window.location.href = 'orders.html';
 
@@ -193,7 +203,6 @@ window.placeOrder = async function() {
         alert(`Échec de la commande : ${error.message}`);
     }
 };
-
 
 
 // Fonctions auxiliaires
