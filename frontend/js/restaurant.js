@@ -20,19 +20,14 @@ window.viewRestaurant = async function(id) {
 
         document.getElementById("modal-restaurant-name").textContent = `Menu du Restaurant ${id}`;
         const menuList = document.getElementById("modal-menu-list");
-        menuList.innerHTML = "";
-
-        foodItems.forEach(dish => {
-            const listItem = document.createElement("li");
-            listItem.classList.add("list-group-item");
-            listItem.innerHTML = `
+        menuList.innerHTML = foodItems.map(dish => `
+            <li class="list-group-item">
                 ${dish.name} - ${dish.price}€
                 <button class="btn btn-sm btn-success" onclick="addToCart(${dish.id}, '${dish.name.replace(/'/g, "\\'")}', ${dish.price}, ${id})">
                     Ajouter
                 </button>
-            `;
-            menuList.appendChild(listItem);
-        });
+            </li>
+        `).join('');
 
         currentRestaurantId = id;
         new bootstrap.Modal(document.getElementById("menuModal")).show();
@@ -120,60 +115,49 @@ function removeFromCart(index) {
 
 async function fetchRestaurants() {
     if (!authToken) {
-        console.warn("Utilisateur non authentifié !");
         window.location.href = '../auth/login.html';
         return;
     }
 
-    let id = 1;
-    let foundRestaurants = false;
+    try {
+        const response = await fetch(`${API_BASE_URL}/restaurants`, {
+            headers: { "Authorization": `Bearer ${authToken}` }
+        });
 
-    async function fetchNext() {
-        try {
-            const response = await fetch(`${API_BASE_URL}/restaurants/${id}`, {
-                headers: { "Authorization": `Bearer ${authToken}` }
-            });
+        if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
 
-            if (response.status === 404) {
-                console.log(`Fin du chargement des restaurants.`);
-                if (!foundRestaurants) {
-                    restaurantList.innerHTML = `<p class="text-muted">❌ Aucun restaurant trouvé.</p>`;
-                }
-                return;
-            }
+        const restaurants = await response.json();
 
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status}`);
-            }
+        if (restaurants.length === 0) {
+            restaurantList.innerHTML = `<p class="text-muted">❌ Aucun restaurant trouvé.</p>`;
+            return;
+        }
 
-            const restaurant = await response.json();
-            foundRestaurants = true;
-
-            const card = `
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <img src="${restaurant.image || 'default.jpg'}" class="card-img-top" alt="${restaurant.name}">
-                        <div class="card-body">
-                            <h5 class="card-title">${restaurant.name}</h5>
-                            <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
-                            <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
-                            <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
-                        </div>
+        restaurantList.innerHTML = restaurants.map(restaurant => `
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="${restaurant.image || 'default.jpg'}" class="card-img-top" alt="${restaurant.name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${restaurant.name}</h5>
+                        <p class="card-text">${restaurant.cuisine || 'Type inconnu'}</p>
+                        <p class="text-muted">Livraison: ${restaurant.deliveryTime || 'Non spécifié'}</p>
+                        <button class="btn btn-danger" onclick="viewRestaurant(${restaurant.id})">Voir le menu</button>
                     </div>
                 </div>
-            `;
-            restaurantList.innerHTML += card;
-
-            id++;
-            fetchNext();
-        } catch (error) {
-            console.error("Erreur lors du chargement des restaurants:", error);
-            alert(`Erreur technique: ${error.message}`);
-        }
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error("Erreur lors du chargement des restaurants:", error);
+        alert(`Erreur technique: ${error.message}`);
     }
-
-    fetchNext();
 }
 
+
 // ⏳ Charger les restaurants au démarrage
-document.addEventListener("DOMContentLoaded", fetchRestaurants);
+document.addEventListener("DOMContentLoaded", () => {
+    if (restaurantId) {
+        viewRestaurant(restaurantId);
+    } else {
+        fetchRestaurants();
+    }
+});
