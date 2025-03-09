@@ -3,6 +3,7 @@ const authToken = localStorage.getItem('authToken');
 const restaurantList = document.getElementById("restaurant-list");
 const urlParams = new URLSearchParams(window.location.search);
 const restaurantId = urlParams.get("id");
+const userId = localStorage.getItem('userId');
 
 let cart = [];
 let currentRestaurantId = null;
