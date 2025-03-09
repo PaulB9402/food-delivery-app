@@ -122,7 +122,7 @@ function logout() {
     localStorage.removeItem('userId');
 
     // Rediriger vers la page de connexion
-    window.location.href = '../auth/login.html';
+    window.location.href = './auth/login.html';
 }
 
 if (loginForm) {
