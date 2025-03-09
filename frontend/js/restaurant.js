@@ -14,11 +14,18 @@ let currentRestaurantId = null;
  * 🛒 Récupérer le panier depuis l'API
  * ============================ */
 async function fetchCart() {
-    if (!authToken || !userId) return;
+    if (!authToken || !userId) {
+        console.warn("Utilisateur non authentifié !");
+        window.location.href = '../auth/login.html';
+        return;
+    }
 
     try {
         const response = await fetch(`${API_BASE_URL}/carts/user/${userId}`, {
-            headers: { "Authorization": `Bearer ${authToken}` }
+            headers: {
+                "Authorization": `Bearer ${authToken}`,
+                "Content-Type": "application/json"
+            }
         });
 
         if (response.ok) {
@@ -26,7 +33,7 @@ async function fetchCart() {
             cart = data.items || [];
             console.log("🟢 Panier chargé :", cart);
         } else {
-            console.warn("⚠️ Impossible de charger le panier.");
+            console.warn("⚠️ Impossible de charger le panier. Statut HTTP:", response.status);
         }
     } catch (error) {
         console.error("❌ Erreur lors du chargement du panier :", error);
@@ -175,6 +182,10 @@ window.viewCart = function() {
 
     const total = cart.reduce((sum, item) => sum + item.foodItem.price * item.quantity, 0);
     document.getElementById("cart-total").textContent = `${total.toFixed(2)}€`;
+
+    // Afficher le modal du panier
+    const cartModal = new bootstrap.Modal(document.getElementById("cartModal"));
+    cartModal.show();
 };
 
 /** ============================

@@ -15,6 +15,7 @@ public class CartController {
     private CustomCartService cartService;
 
     @GetMapping("/user/{userId}")
+    @Transactional(readOnly = true)
     public ResponseEntity<Cart> getCartByUserId(@PathVariable Long userId) {
         Cart cart = cartService.getCartByUserId(userId);
         // Initialiser la collection items avant de fermer la session

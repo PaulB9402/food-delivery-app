@@ -134,6 +134,42 @@ function displayOrderDetails(order) {
     new bootstrap.Modal(document.getElementById("orderDetailsModal")).show();
 }
 
+async function placeOrder() {
+    const priceElement = document.getElementById("cart-total");
+    const price = parseFloat(priceElement.textContent.replace('€', '')).toFixed(2);
+    
+    if (!authToken || !currentRestaurantId || cart.length === 0) {
+        alert("Votre panier est vide ou vous n'êtes pas connecté.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/orders/place`, {
+            method: 'POST',
+            headers: { "Authorization": `Bearer ${authToken}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                customerId: parseInt(localStorage.getItem('userId')),
+                restaurantId: currentRestaurantId,
+                totalPrice: price,
+                orderItems: cart.map(item => ({ foodItemId: item.dishId, quantity: item.quantity }))
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Erreur lors de la commande");
+        }
+
+        alert("Commande passée avec succès !");
+        cart = [];
+        currentRestaurantId = null;
+        viewCart();
+        window.location.href = 'orders.html'; // Redirection vers la page des commandes
+    } catch (error) {
+        console.error("Erreur commande :", error);
+        alert("Impossible de passer la commande.");
+    }
+}
+
 /** ==========================
  *  INITIALISATION
  *  ========================== */

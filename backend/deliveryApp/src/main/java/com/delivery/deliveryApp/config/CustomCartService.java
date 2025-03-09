@@ -1,7 +1,16 @@
 package com.delivery.deliveryApp.config;
 
-import com.delivery.deliveryApp.model.*;
-import com.delivery.deliveryApp.repository.*;
+import com.delivery.deliveryApp.model.Cart;
+import com.delivery.deliveryApp.model.CartItem;
+import com.delivery.deliveryApp.model.FoodItem;
+import com.delivery.deliveryApp.model.Order;
+import com.delivery.deliveryApp.model.OrderItem;
+import com.delivery.deliveryApp.model.User;
+import com.delivery.deliveryApp.dto.OrderItemRequestDTO;
+import com.delivery.deliveryApp.repository.CartRepository;
+import com.delivery.deliveryApp.repository.FoodItemRepository;
+import com.delivery.deliveryApp.repository.OrderRepository;
+import com.delivery.deliveryApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +35,16 @@ public class CustomCartService {
     private OrderRepository orderRepository;
 
     public Cart getCartByUserId(Long userId) {
-        return cartRepository.findByUserId(userId).orElseGet(() -> {
-            Cart cart = new Cart();
+        Cart cart = cartRepository.findByUserId(userId).orElseGet(() -> {
+            Cart newCart = new Cart();
             User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-            cart.setUser(user);
-            cartRepository.save(cart);
-            return cart;
+            newCart.setUser(user);
+            cartRepository.save(newCart);
+            return newCart;
         });
+        // Initialiser la collection items avant de fermer la session
+        cart.getItems().size();
+        return cart;
     }
 
     @Transactional
@@ -56,30 +68,30 @@ public class CustomCartService {
     }
 
     @Transactional
-    public Order placeOrder(Long userId) {
-        Cart cart = getCartByUserId(userId);
+    public Order placeOrder(Long customerId, Long restaurantId, List<OrderItemRequestDTO> orderItems) {
+        User user = userRepository.findById(customerId).orElseThrow(() -> new RuntimeException("User not found"));
+        Cart cart = getCartByUserId(customerId);
         if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
         Order order = new Order();
-        order.setCustomer(cart.getUser());
-        order.setRestaurant(cart.getItems().get(0).getFoodItem().getRestaurant());
+        order.setCustomer(user);
+
+        List<OrderItem> orderItemList = new ArrayList<>();
+        for (OrderItemRequestDTO itemDTO : orderItems) {
+            FoodItem foodItem = foodItemRepository.findById(itemDTO.getFoodItemId()).orElseThrow(() -> new RuntimeException("Food item not found"));
+            OrderItem orderItem = new OrderItem();
+            orderItem.setFoodItem(foodItem);
+            orderItem.setQuantity(itemDTO.getQuantity());
+            orderItem.setOrder(order);
+            orderItemList.add(orderItem);
+        }
+        order.setOrderItems(orderItemList);
+        order.setTotalPrice(orderItemList.stream().mapToDouble(item -> item.getFoodItem().getPrice() * item.getQuantity()).sum());
         order.setStatus("PENDING");
 
-        double totalPrice = 0;
-        List<OrderItem> orderItems = new ArrayList<>();
-        for (CartItem cartItem : cart.getItems()) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setFoodItem(cartItem.getFoodItem());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setOrder(order);
-            orderItems.add(orderItem);
-            totalPrice += cartItem.getFoodItem().getPrice() * cartItem.getQuantity();
-        }
-        order.setOrderItems(orderItems);
-        order.setTotalPrice(totalPrice);
-
+        // Clear the cart after placing the order
         cart.getItems().clear();
         cartRepository.save(cart);
 
