@@ -70,7 +70,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continuer les achats</button>
                     <button type="button" class="btn btn-danger" onclick="clearCart()">Vider le panier</button>
-                    <button type="button" class="btn btn-primary" id="place-order-btn" onclick="placeOrder()">Passer la commande</button> <!-- 🔄 ID ajouté -->
+                    <button type="button" class="btn btn-primary" id="place-order-btn">Passer la commande</button> <!-- 🔄 ID ajouté -->
                 </div>
             </div>
         </div>
@@ -89,6 +89,8 @@
             document.addEventListener('cart-updated', () => { // Écouter l'événement personnalisé
                 placeOrderBtn.disabled = cart.length === 0; // Activer seulement si le panier n'est pas vide
             });
+
+            placeOrderBtn.addEventListener('click', placeOrder); // Ajouter l'écouteur d'événement ici
         });
 
         // 🔄 Gestion du logout

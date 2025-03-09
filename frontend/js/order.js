@@ -135,9 +135,10 @@ function displayOrderDetails(order) {
 }
 
 async function placeOrder() {
+    console.log("placeOrder function called"); // Ajout du log
     const priceElement = document.getElementById("cart-total");
     const price = parseFloat(priceElement.textContent.replace('€', '')).toFixed(2);
-    
+
     if (!authToken || !currentRestaurantId || cart.length === 0) {
         alert("Votre panier est vide ou vous n'êtes pas connecté.");
         return;

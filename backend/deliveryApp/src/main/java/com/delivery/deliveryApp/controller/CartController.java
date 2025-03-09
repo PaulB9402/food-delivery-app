@@ -14,6 +14,12 @@ public class CartController {
     @Autowired
     private CustomCartService cartService;
 
+    @PostMapping("/user/{userId}/clear")
+    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
+        cartService.clearCart(userId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/user/{userId}")
     @Transactional(readOnly = true)
     public ResponseEntity<Cart> getCartByUserId(@PathVariable Long userId) {
@@ -35,4 +41,5 @@ public class CartController {
             return ResponseEntity.status(500).body("Erreur lors de l'ajout de l'article au panier.");
         }
     }
+    
 }

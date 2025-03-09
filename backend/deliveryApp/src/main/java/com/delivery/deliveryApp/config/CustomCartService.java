@@ -32,7 +32,7 @@ public class CustomCartService {
     private UserRepository userRepository;
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderRepository orderRepository;    
 
     public Cart getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId).orElseGet(() -> {
@@ -96,5 +96,14 @@ public class CustomCartService {
         cartRepository.save(cart);
 
         return orderRepository.save(order);
+    }
+
+    public void clearCart(Long userId) {
+        Optional<Cart> optionalCart = cartRepository.findByUserId(userId);
+        if (optionalCart.isPresent()) {
+            Cart cart = optionalCart.get();
+            cart.getItems().clear(); // 🔄 Vider les items du panier
+            cartRepository.save(cart); // 🔄 Enregistrer les modifications
+        }
     }
 }
