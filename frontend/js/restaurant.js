@@ -76,35 +76,47 @@ window.clearCart = function() {
 
 window.placeOrder = async function() {
     if (!authToken || !currentRestaurantId || cart.length === 0) {
-        alert("Panier vide ou non connecté !");
+        alert("Erreur : Panier vide ou utilisateur non connecté !");
         return;
     }
 
     try {
+        const orderData = {
+            customerId: parseInt(userId),
+            restaurantId: currentRestaurantId,
+            orderItems: cart.map(item => ({
+                foodItemId: item.dishId,
+                quantity: item.quantity,
+                customization: item.customization || ""
+            }))
+        };
+
+        console.log("Order Data Sent:", orderData);
+
         const response = await fetch(`${API_BASE_URL}/orders`, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${authToken}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                customerId: parseInt(localStorage.getItem('userId')),
-                restaurantId: currentRestaurantId,
-                items: cart.map(item => ({
-                    foodItemId: item.dishId,
-                    quantity: item.quantity
-                }))
-            })
+            body: JSON.stringify(orderData)
         });
 
-        if (!response.ok) throw new Error("Erreur commande");
-        alert("Commande réussie !");
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Erreur lors de la commande");
+        }
+
+        alert("Commande passée avec succès !");
         clearCart();
+        window.location.href = 'orders.html';
+
     } catch (error) {
         console.error("Erreur commande :", error);
-        alert("Échec de la commande");
+        alert("Échec de la commande : " + error.message);
     }
 };
+
 
 // Fonctions auxiliaires
 function removeFromCart(index) {
