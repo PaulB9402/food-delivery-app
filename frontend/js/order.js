@@ -172,7 +172,7 @@ window.placeOrder = async function() {
 
     try {
         console.log("📦 Tentative de passage de commande...");
-        
+
         const orderData = {
             customerId: parseInt(userId),
             restaurantId: parseInt(currentRestaurantId),
@@ -182,11 +182,20 @@ window.placeOrder = async function() {
             }))
         };
 
+        console.log("📦 Données de la commande envoyées :", JSON.stringify(orderData));
+
         const response = await fetch(`${API_BASE_URL}/orders/place`, {
             method: 'POST',
-            headers: { "Authorization": `Bearer ${authToken}`, "Content-Type": "application/json" },
+            headers: { 
+                "Authorization": `Bearer ${authToken}`, 
+                "Content-Type": "application/json" 
+            },
             body: JSON.stringify(orderData)
         });
+
+        console.log("🔄 Réponse brute :", response);
+        const responseData = await response.text();
+        console.log("🔄 Réponse du serveur :", responseData);
 
         if (!response.ok) {
             if (response.status === 403) {
@@ -200,7 +209,7 @@ window.placeOrder = async function() {
         localStorage.removeItem('currentRestaurantId'); // Supprimer l'ID du restaurant après la commande
         window.location.href = 'orders.html'; // Redirection vers la page des commandes
     } catch (error) {
-        console.error("Erreur commande :", error);
+        console.error("❌ Erreur lors de la commande :", error);
         alert("Impossible de passer la commande.");
     }
 }
