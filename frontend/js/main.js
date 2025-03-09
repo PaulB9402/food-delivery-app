@@ -73,7 +73,11 @@ function loadRestaurants() {
         console.error("Erreur critique:", error);
 
         if (error.message.includes("accès refusé")) {
-            alert("Votre session a expiré. Veuillez vous reconnecter.");
+            console.error("Détails du refus:", {
+                token: localStorage.getItem('authToken'),
+                role: localStorage.getItem('userRole')
+            });
+            alert("Accès refusé. Vérifiez vos permissions.");
             logout();
         } else {
             alert(`Erreur technique: ${error.message}`);
