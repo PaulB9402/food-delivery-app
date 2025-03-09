@@ -2,6 +2,7 @@ package com.delivery.deliveryApp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/food-items","/food-items/**").permitAll()
                         .requestMatchers("/menu", "/menu/**").permitAll()
                         .requestMatchers("/admin", "/admin/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/orders").permitAll() 
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
