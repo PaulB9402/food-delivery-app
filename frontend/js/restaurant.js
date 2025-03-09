@@ -146,7 +146,7 @@ window.placeOrder = async function() {
     }
 
     // 🔒 Seuls les clients peuvent commander
-    if (userRole !== "CUSTOMER") {
+    if (userRole !== "CLIENT") {
         alert("🚫 Seuls les clients peuvent passer une commande !");
         return;
     }

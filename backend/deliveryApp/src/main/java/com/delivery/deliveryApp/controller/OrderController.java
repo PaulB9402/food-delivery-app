@@ -25,7 +25,7 @@ public class OrderController {
     private CustomCartService cartService;
 
     @PostMapping
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Order> createOrder(@AuthenticationPrincipal User user, @RequestBody Order order) {
     if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
