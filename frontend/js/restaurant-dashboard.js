@@ -108,15 +108,24 @@ async function loadOrders() {
         const ordersList = document.getElementById("orders-list");
         ordersList.innerHTML = "";
 
+        if (orders.length === 0) {
+            ordersList.innerHTML = "<p class='text-muted'>Aucune commande disponible.</p>";
+            return;
+        }
+
         orders.forEach(order => {
+            const customerName = order.customer?.name || "Client inconnu";
+            const total = order.total || order.orderItems.reduce((acc, item) => acc + item.foodItem.price * item.quantity, 0);
+            const status = order.status || "Statut inconnu";
+
             const card = `
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Commande #${order.id}</h5>
-                            <p class="card-text">Client: ${order.customer.name}</p>
-                            <p class="card-text">Total: ${order.total}€</p>
-                            <p class="card-text">Statut: ${order.status}</p>
+                            <p class="card-text">Client: ${customerName}</p>
+                            <p class="card-text">Total: ${total.toFixed(2)}€</p>
+                            <p class="card-text">Statut: ${status}</p>
                             <button class="btn btn-danger" onclick="viewOrderDetails(${order.id})">Voir les détails</button>
                         </div>
                     </div>
@@ -129,6 +138,7 @@ async function loadOrders() {
         alert("Impossible de charger les commandes.");
     }
 }
+
 
 /** ==========================
  *  INITIALISATION
