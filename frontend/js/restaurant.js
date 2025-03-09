@@ -120,7 +120,7 @@ async function fetchRestaurants() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/restaurants`, {
+        const response = await fetch(`${API_BASE_URL}/restaurants/${id}`, {
             headers: { "Authorization": `Bearer ${authToken}` }
         });
 
